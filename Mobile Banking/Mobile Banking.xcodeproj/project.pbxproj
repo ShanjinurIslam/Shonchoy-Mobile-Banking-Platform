@@ -7,16 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		220014762484A3AD00EB1093 /* HindSiliguri-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 220014752484A33000EB1093 /* HindSiliguri-SemiBold.ttf */; };
 		2251372D24849B33002C523E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2251372C24849B33002C523E /* AppDelegate.swift */; };
 		2251372F24849B33002C523E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2251372E24849B33002C523E /* SceneDelegate.swift */; };
 		2251373124849B33002C523E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2251373024849B33002C523E /* ViewController.swift */; };
 		2251373424849B33002C523E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2251373224849B33002C523E /* Main.storyboard */; };
 		2251373724849B33002C523E /* Mobile_Banking.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2251373524849B33002C523E /* Mobile_Banking.xcdatamodeld */; };
 		2251373924849B38002C523E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2251373824849B38002C523E /* Assets.xcassets */; };
-		2251373C24849B38002C523E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2251373A24849B38002C523E /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		220014752484A33000EB1093 /* HindSiliguri-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HindSiliguri-SemiBold.ttf"; sourceTree = "<group>"; };
 		2251372924849B33002C523E /* Mobile Banking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mobile Banking.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2251372C24849B33002C523E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2251372E24849B33002C523E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,7 +25,6 @@
 		2251373324849B33002C523E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		2251373624849B33002C523E /* Mobile_Banking.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Mobile_Banking.xcdatamodel; sourceTree = "<group>"; };
 		2251373824849B38002C523E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		2251373B24849B38002C523E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2251373D24849B38002C523E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,6 +39,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		220014742484A31D00EB1093 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				220014752484A33000EB1093 /* HindSiliguri-SemiBold.ttf */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
 		2251372024849B33002C523E = {
 			isa = PBXGroup;
 			children = (
@@ -58,12 +66,12 @@
 		2251372B24849B33002C523E /* Mobile Banking */ = {
 			isa = PBXGroup;
 			children = (
+				220014742484A31D00EB1093 /* fonts */,
 				2251372C24849B33002C523E /* AppDelegate.swift */,
 				2251372E24849B33002C523E /* SceneDelegate.swift */,
 				2251373024849B33002C523E /* ViewController.swift */,
 				2251373224849B33002C523E /* Main.storyboard */,
 				2251373824849B38002C523E /* Assets.xcassets */,
-				2251373A24849B38002C523E /* LaunchScreen.storyboard */,
 				2251373D24849B38002C523E /* Info.plist */,
 				2251373524849B33002C523E /* Mobile_Banking.xcdatamodeld */,
 			);
@@ -128,9 +136,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2251373C24849B38002C523E /* LaunchScreen.storyboard in Resources */,
 				2251373924849B38002C523E /* Assets.xcassets in Resources */,
 				2251373424849B33002C523E /* Main.storyboard in Resources */,
+				220014762484A3AD00EB1093 /* HindSiliguri-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,14 +165,6 @@
 				2251373324849B33002C523E /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		2251373A24849B38002C523E /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				2251373B24849B38002C523E /* Base */,
-			);
-			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
