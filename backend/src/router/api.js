@@ -10,5 +10,12 @@ router.post('', (req, res) => {
     res.send({ appName: 'Mobile Banking' })
 })
 
+// check mobile number if already registered (GENERAL CATAGORY)
+
+
+// create application
+router.post('/postApplication', (req, res) => {
+
+})
 
 module.exports = router
