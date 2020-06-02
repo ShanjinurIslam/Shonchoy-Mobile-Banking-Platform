@@ -1,9 +1,17 @@
 const mongoose = require('mongoose')
 
-const accountSchema = new mongoose.Schema({
+const agentSchema = new mongoose.Schema({
     client: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Client',
+    },
+    TLN: {
+        type: Number,
+        required: true,
+        unique: true,
+    },
+    email: {
+        type: String,
     },
     mobileNo: {
         type: String,
@@ -18,16 +26,24 @@ const accountSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    businessOrganizationName: {
+        type: String,
+        required: true,
+    },
+    businessAddress: {
+        type: String,
+        required: true,
+    },
     balance: {
         type: Number,
         default: 0,
     },
     verified: {
         type: Boolean,
-        default: false,
-    },
+        default: false
+    }
 })
 
-const Account = mongoose.model('Account', accountSchema)
+const agent = mongoose.model('Agent', agentSchema)
 
-module.exports = Account
+module.exports = agent

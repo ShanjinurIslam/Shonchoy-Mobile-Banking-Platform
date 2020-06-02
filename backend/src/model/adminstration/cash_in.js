@@ -1,25 +1,21 @@
 const mongoose = require('mongoose')
 
-const sendMoneySchema = new mongoose.Schema({
+const CashInSchema = new mongoose.Schema({
     transactionType: {
         type: String,
         required: true
     },
     sender: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account'
+        ref: 'Personal'
     },
     receiver: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account'
+        ref: 'Agent'
     },
     amount: {
         type: Number,
         required: true
-    },
-    charge: {
-        type: Number,
-        required: true,
     },
     createdAt: {
         type: Date,
@@ -27,5 +23,5 @@ const sendMoneySchema = new mongoose.Schema({
     }
 })
 
-const SendMoney = mongoose.model('SendMoney', sendMoneySchema)
-module.exports = SendMoney
+const CashIn = mongoose.model('CashIn', CashInSchema)
+module.exports = CashIn

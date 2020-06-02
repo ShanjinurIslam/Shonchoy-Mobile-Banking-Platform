@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
-const AccountVerificationSchema = new mongoose.Schema({
+const MerchantVerificationSchema = new mongoose.Schema({
     accout: {
         type: mongoose.Schema.type.ObjectId,
-        ref: 'Account'
+        ref: 'Agent'
     },
     NIDFront: {
         type: Buffer,
@@ -17,12 +17,16 @@ const AccountVerificationSchema = new mongoose.Schema({
         type: Buffer,
         required: true,
     },
+    tradeLicencePhoto: {
+        type: Buffer,
+        required: true,
+    },
     createdAt: {
         type: Boolean,
         default: Date.now()
     }
 })
 
-const AccountVerification = mongoose.model('Account', AccountVerificationSchema)
+const MerchantVerification = mongoose.model('MerchantVerification', MerchantVerificationSchema)
 
-module.exports = AccountVerification
+module.exports = MerchantVerification
