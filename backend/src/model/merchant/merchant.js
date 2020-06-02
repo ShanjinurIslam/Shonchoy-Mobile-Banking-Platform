@@ -10,9 +10,6 @@ const merchantSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    email: {
-        type: String,
-    },
     mobileNo: {
         type: String,
         required: true,
@@ -37,6 +34,9 @@ const merchantSchema = new mongoose.Schema({
     businessType: {
         type: String,
         required: true,
+    },
+    businessEmail: {
+        type: String,
     },
     webAddress: {
         type: String,

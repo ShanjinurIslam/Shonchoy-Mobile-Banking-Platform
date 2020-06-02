@@ -13,7 +13,13 @@ const clientSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    NID: {
+    IDType: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    IDNumber: {
+        type: String,
         required: true,
         unique: true
     },
@@ -30,11 +36,11 @@ const clientSchema = new mongoose.Schema({
         required: true,
         type: String,
     },
-    thana: {
+    city: {
         required: true,
         type: String,
     },
-    city: {
+    subdistrict: {
         required: true,
         type: String,
     },
@@ -51,7 +57,7 @@ const clientSchema = new mongoose.Schema({
         type: String,
     },
     createdAt: {
-        type: Boolean,
+        type: Date,
         default: Date.now()
     }
 })

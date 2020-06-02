@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const CashOutSchema = new mongoose.Schema({
-    transactionType: {
-        type: String,
-        required: true
+    transaction: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transaction'
     },
     sender: {
         type: mongoose.Schema.Types.ObjectId,
@@ -12,14 +12,6 @@ const CashOutSchema = new mongoose.Schema({
     receiver: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Agent'
-    },
-    amount: {
-        type: Number,
-        required: true
-    },
-    charge: {
-        type: Number,
-        required: true,
     },
     createdAt: {
         type: Date,

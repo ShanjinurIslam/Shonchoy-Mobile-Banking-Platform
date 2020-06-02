@@ -5,11 +5,11 @@ const MerchantVerificationSchema = new mongoose.Schema({
         type: mongoose.Schema.type.ObjectId,
         ref: 'Agent'
     },
-    NIDFront: {
+    IDFront: {
         type: Buffer,
         required: true
     },
-    NIDBack: {
+    IDBack: {
         type: Buffer,
         required: true
     },

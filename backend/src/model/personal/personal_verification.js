@@ -1,24 +1,25 @@
 const mongoose = require('mongoose')
 
 const PersonalVerificationSchema = new mongoose.Schema({
-    accout: {
-        type: mongoose.Schema.type.ObjectId,
-        ref: 'Personal'
+    personal: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Personal',
+        unique: true
     },
-    NIDFront: {
+    IDFront: {
         type: Buffer,
-        required: true
+        //required: true
     },
-    NIDBack: {
+    IDBack: {
         type: Buffer,
-        required: true
+        //required: true
     },
     currentPhoto: {
         type: Buffer,
-        required: true,
+        //required: true,
     },
     createdAt: {
-        type: Boolean,
+        type: Date,
         default: Date.now()
     }
 })

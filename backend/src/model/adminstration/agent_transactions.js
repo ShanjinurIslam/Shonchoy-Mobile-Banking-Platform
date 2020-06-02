@@ -5,7 +5,7 @@ const AgentTransactionSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    merchant: {
+    agent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Agent'
     },
