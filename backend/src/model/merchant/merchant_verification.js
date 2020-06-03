@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const MerchantVerificationSchema = new mongoose.Schema({
     accout: {
-        type: mongoose.Schema.type.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Agent'
     },
     IDFront: {

@@ -1,7 +1,29 @@
 const router = require('express').Router()
-const Personal = require('../model/personal/personal')
+
 const Client = require('../model/client')
+
+// personal models
+const Personal = require('../model/personal/personal')
 const PersonalVerification = require('../model/personal/personal_verification')
+
+// agent models
+const Agent = require('../model/agent/agent')
+const AgentVerification = require('../model/agent/agent_verification')
+
+// merchant models
+
+const Merchant = require('../model/merchant/merchant')
+const MerchantVerification = require('../model/merchant/merchant_verification')
+
+// middlewares
+
+const personalAuth = require('../middleware/personal_auth')
+const jwt = require('jsonwebtoken')
+
+// sendmoney
+
+const transaction = require('../model/adminstration/transaction')
+const sendmoney = require('../model/adminstration/send_money')
 
 const nexmo = require('../config/nexmo')
 var multer = require('multer')
@@ -14,7 +36,7 @@ router.post('/personal/mobile', async(req, res) => {
     if (!personal) {
         res.status(404).send({ message: 'This number is not linked to any account' })
     } else {
-        res.status(200).send({ message: 'This number is already registered' })
+        res.status(200).send(personal)
     }
 })
 
@@ -89,6 +111,139 @@ router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
         res.status(502).send({ message: e.message })
     }
 })
+
+router.post('/personal/login', async(req, res) => {
+    const personal = await Personal.authenticate(req.body.mobileNo, req.body.pinCode)
+    if (!personal.verified) {
+        res.status(200).send({ message: "Account Verification Still in Progress" })
+    } else {
+        const token = await personal.generateAuthToken()
+        res.status(200).send({ personal, token })
+    }
+})
+
+router.post('/personal/logout', personalAuth, (req, res) => {
+    const personal = req.personal
+    const tokens = personal.tokens.filter((tokens) => tokens.token != req.token)
+    personal.tokens = tokens
+    personal.save().then((result) => {
+        res.status(200).send(result)
+    }).catch((e) => {
+        res.status(400).send(e.message)
+    })
+})
+
+router.post('/personal/logoutAll', personalAuth, (req, res) => {
+    const personal = req.personal
+    personal.tokens = []
+    personal.save().then((result) => {
+        res.status(200).send(result)
+    }).catch((e) => {
+        res.status(400).send(e.message)
+    })
+})
+
+router.post('/personal/check', personalAuth, (req, res) => {
+    Personal.findOne({ mobileNo: req.body.mobileNo }).then((result) => {
+        res.send(result)
+    }).catch((e) => {
+        res.send(e.message)
+    })
+})
+
+router.get('/personal/me', personalAuth, async(req, res) => {
+    res.status(200).send(req.personal)
+})
+
+// agent registration
+
+router.post('/agent/registerClient', async(req, res) => {
+    try {
+        const client = new Client(req.body)
+        await client.save()
+        res.status(201).send({ client_id: client._id })
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+// register agent account
+
+router.post('/agent/registerAccount', async(req, res) => {
+    try {
+        const agent = new Agent(req.body)
+        await agent.save()
+        res.status(201).send(agent._id)
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }, { name: 'tradeLicencePhoto', maxCount: 1 }])
+
+router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
+    try {
+        const agentVerification = new AgentVerification({
+            personal: req.body.accountID,
+            IDFront: req.files.IDFront[0].buffer,
+            IDBack: req.files.IDBack[0].buffer,
+            currentPhoto: req.files.currentPhoto[0].buffer,
+            tradeLicencePhoto: req.files.tradeLicencePhoto[0].buffer
+        })
+        await AgentVerification.save()
+        res.status(201).send(agentVerification._id)
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+
+
+
+
+// merchant registration
+
+router.post('/merchant/registerClient', async(req, res) => {
+    try {
+        const client = new Client(req.body)
+        await client.save()
+        res.status(201).send({ client_id: client._id })
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+// register merchant account
+
+router.post('/merchant/registerAccount', async(req, res) => {
+    try {
+        const merchant = new Merchant(req.body)
+        await merchant.save()
+        res.status(201).send(agent._id)
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }, { name: 'tradeLicencePhoto', maxCount: 1 }])
+
+router.post('/merchant/verifyAccount', cpUpload, async(req, res) => {
+    try {
+        const merchantVerification = new MerchantVerification({
+            personal: req.body.accountID,
+            IDFront: req.files.IDFront[0].buffer,
+            IDBack: req.files.IDBack[0].buffer,
+            currentPhoto: req.files.currentPhoto[0].buffer,
+            tradeLicencePhoto: req.files.tradeLicencePhoto[0].buffer
+        })
+        await merchantVerification.save()
+        res.status(201).send(agentVerification._id)
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+
 
 
 module.exports = router

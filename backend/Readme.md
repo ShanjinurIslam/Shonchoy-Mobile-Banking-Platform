@@ -4,6 +4,8 @@ Installed NPM Packages
 2. body parser
 3. express-session
 4. mongoose
+5. bcryptjs
+6. jsonwebtoken
 
 
 Project Structure
