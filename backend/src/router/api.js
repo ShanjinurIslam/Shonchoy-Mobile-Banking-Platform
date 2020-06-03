@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const bcrypt = require('bcryptjs')
 
 const Client = require('../model/client')
 
@@ -22,8 +23,8 @@ const jwt = require('jsonwebtoken')
 
 // sendmoney
 
-const transaction = require('../model/adminstration/transaction')
-const sendmoney = require('../model/adminstration/send_money')
+const Transaction = require('../model/adminstration/transaction')
+const Sendmoney = require('../model/adminstration/send_money')
 
 const nexmo = require('../config/nexmo')
 var multer = require('multer')
@@ -144,15 +145,47 @@ router.post('/personal/logoutAll', personalAuth, (req, res) => {
 })
 
 router.post('/personal/check', personalAuth, (req, res) => {
-    Personal.findOne({ mobileNo: req.body.mobileNo }).then((result) => {
+    Personal.checkMobileNo(req.body.mobileNo).then((result) => {
         res.send(result)
     }).catch((e) => {
         res.send(e.message)
     })
 })
 
-router.get('/personal/me', personalAuth, async(req, res) => {
+router.get('/personal/me', personalAuth, (req, res) => {
     res.status(200).send(req.personal)
+})
+
+
+router.post('/personal/sendMoney', personalAuth, async(req, res) => {
+    const pinCode = req.body.pinCode
+    const amount = req.body.amount
+    const transactionType = req.body.transactionType
+
+    const isMatch = await bcrypt.compare(pinCode, req.personal.pinCode)
+    if (isMatch) {
+        const senderPersonal = req.personal
+        const receiverPersonal = await Personal.findOne({ mobileNo: req.body.receiver })
+
+        if (senderPersonal.balance > amount) {
+            const transaction = new Transaction({ transactionType, amount })
+            await transaction.save()
+
+            senderPersonal.balance = senderPersonal.balance - transaction.amount
+            receiverPersonal.balance = receiverPersonal.balance + transaction.amount
+            await senderPersonal.save()
+            await receiverPersonal.save()
+
+            const sendMoney = new Sendmoney({ transaction: transaction._id, sender: senderPersonal._id, receiver: receiverPersonal._id })
+            await sendMoney.save()
+            return res.status(200).send(sendMoney)
+        } else {
+            return res.status(400).send({ message: "Insufficient Balance" })
+        }
+
+    } else {
+        return res.status(400).send()
+    }
 })
 
 // agent registration
@@ -196,9 +229,6 @@ router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
         res.status(502).send({ message: e.message })
     }
 })
-
-
-
 
 
 // merchant registration

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Personal = require('../personal/personal')
 
 const sendMoneySchema = new mongoose.Schema({
     transaction: {
@@ -18,6 +19,7 @@ const sendMoneySchema = new mongoose.Schema({
         default: Date.now()
     }
 })
+
 
 const SendMoney = mongoose.model('SendMoney', sendMoneySchema)
 module.exports = SendMoney
