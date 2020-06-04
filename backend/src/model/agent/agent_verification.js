@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const AgentVerificationSchema = new mongoose.Schema({
-    accout: {
+    agent: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Agent'
     },
@@ -22,7 +22,7 @@ const AgentVerificationSchema = new mongoose.Schema({
         required: true,
     },
     createdAt: {
-        type: Boolean,
+        type: Date,
         default: Date.now()
     }
 })

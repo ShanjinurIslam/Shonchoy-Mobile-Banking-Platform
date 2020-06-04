@@ -19,12 +19,15 @@ const MerchantVerification = require('../model/merchant/merchant_verification')
 // middlewares
 
 const personalAuth = require('../middleware/personal_auth')
-const jwt = require('jsonwebtoken')
+const agentAuth = require('../middleware/agent_auth')
 
 // sendmoney
 
 const Transaction = require('../model/adminstration/transaction')
 const Sendmoney = require('../model/adminstration/send_money')
+const Payment = require('../model/adminstration/payments')
+const CashIn = require('../model/adminstration/cash_in')
+const CashOut = require('../model/adminstration/cash_out')
 
 const nexmo = require('../config/nexmo')
 var multer = require('multer')
@@ -114,12 +117,16 @@ router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
 })
 
 router.post('/personal/login', async(req, res) => {
-    const personal = await Personal.authenticate(req.body.mobileNo, req.body.pinCode)
-    if (!personal.verified) {
-        res.status(200).send({ message: "Account Verification Still in Progress" })
-    } else {
-        const token = await personal.generateAuthToken()
-        res.status(200).send({ personal, token })
+    try {
+        const personal = await Personal.authenticate(req.body.mobileNo, req.body.pinCode)
+        if (!personal.verified) {
+            res.status(200).send({ message: "Account Verification Still in Progress" })
+        } else {
+            const token = await personal.generateAuthToken()
+            res.status(200).send({ personal, token })
+        }
+    } catch (e) {
+        res.status(502).send(e.message)
     }
 })
 
@@ -188,6 +195,37 @@ router.post('/personal/sendMoney', personalAuth, async(req, res) => {
     }
 })
 
+router.post('/personal/payment', personalAuth, async(req, res) => {
+    const pinCode = req.body.pinCode
+    const amount = req.body.amount
+    const transactionType = req.body.transactionType
+
+    const isMatch = await bcrypt.compare(pinCode, req.personal.pinCode)
+    if (isMatch) {
+        const senderPersonal = req.personal
+        const merchant = await Merchant.findOne({ mobileNo: req.body.receiver })
+
+        if (senderPersonal.balance > amount) {
+            const transaction = new Transaction({ transactionType, amount })
+            await transaction.save()
+
+            senderPersonal.balance = senderPersonal.balance - transaction.amount
+            merchant.balance = merchant.balance + transaction.amount
+            await senderPersonal.save()
+            await merchant.save()
+
+            const payment = new Payment({ transaction: transaction._id, sender: senderPersonal._id, receiver: merchant._id })
+            await payment.save()
+            return res.status(200).send(sendMoney)
+        } else {
+            return res.status(400).send({ message: "Insufficient Balance" })
+        }
+
+    } else {
+        return res.status(400).send()
+    }
+})
+
 // agent registration
 
 router.post('/agent/registerClient', async(req, res) => {
@@ -214,22 +252,126 @@ router.post('/agent/registerAccount', async(req, res) => {
 
 var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }, { name: 'tradeLicencePhoto', maxCount: 1 }])
 
-router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
+router.post('/agent/verifyAccount', cpUpload, async(req, res) => {
     try {
         const agentVerification = new AgentVerification({
-            personal: req.body.accountID,
+            agent: req.body.accountID,
             IDFront: req.files.IDFront[0].buffer,
             IDBack: req.files.IDBack[0].buffer,
             currentPhoto: req.files.currentPhoto[0].buffer,
             tradeLicencePhoto: req.files.tradeLicencePhoto[0].buffer
         })
-        await AgentVerification.save()
+        await agentVerification.save()
         res.status(201).send(agentVerification._id)
     } catch (e) {
         res.status(502).send({ message: e.message })
     }
 })
 
+router.post('/agent/login', async(req, res) => {
+    try {
+        const agent = await Agent.authenticate(req.body.mobileNo, req.body.pinCode)
+        if (!agent.verified) {
+            res.status(200).send({ message: "Account Verification Still in Progress" })
+        } else {
+            const token = await agent.generateAuthToken()
+            res.status(200).send({ agent, token })
+        }
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
+
+router.post('/agent/logout', agentAuth, async(req, res) => {
+    try {
+        const agent = req.agent;
+        const tokens = agent.tokens.filter((tokens) => tokens.token != req.token)
+        agent.tokens = tokens
+        await agent.save()
+        res.status(200).send()
+    } catch (e) {
+        res.send(e.message)
+    }
+})
+
+router.post('/agent/logoutAll', agentAuth, async(req, res) => {
+    try {
+        const agent = req.agent;
+        agent.tokens = []
+        await agent.save()
+        res.status(200).send()
+    } catch (e) {
+        res.send(e.message)
+    }
+})
+
+// agent -> personaal cash in
+
+router.post('/agent/cashIn', agentAuth, async(req, res) => {
+    try {
+        const agent = req.agent;
+        const mobileNo = req.body.mobileNo;
+        const personal = await Personal.findOne({ mobileNo: mobileNo })
+
+        const isMatch = await bcrypt.compare(req.body.pinCode, agent.pinCode)
+        if (isMatch) {
+            if (agent.balance > req.body.amount) {
+                const transaction = new Transaction({ transactionType: req.body.transactionType, amount: req.body.amount })
+
+                agent.balance = agent.balance - transaction.amount
+                personal.balance = personal.balance + transaction.amount
+
+                await transaction.save()
+                await agent.save()
+                await personal.save()
+
+                const cashIn = new CashIn({ transaction: transaction._id, sender: agent._id, receiver: personal._id })
+                await cashIn.save()
+                return res.status(200).send(cashIn)
+            } else {
+                res.status(402).send('Insufficient Balance')
+            }
+        } else {
+            res.status(401).send('Incorrect Pincode')
+        }
+    } catch (e) {
+        res.status(502).send(e.message)
+    }
+})
+
+// personal -> agent cash out
+router.post('/personal/cashOut', personalAuth, async(req, res) => {
+    try {
+        const personal = req.personal
+        const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
+        const isMatch = await bcrypt.compare(req.body.pinCode, agent.pinCode)
+        if (isMatch) {
+            const amount = parseFloat(req.body.amount)
+            const charge = parseFloat(req.body.charge)
+
+            if (personal.balance > amount + charge) {
+                const transaction = new Transaction({ transactionType: req.body.transactionType, amount: (amount + charge) })
+                agent.balance = agent.balance + amount + (.25 * charge)
+                personal.balance = personal.balance - amount - charge
+
+                await transaction.save()
+                await agent.save()
+                await personal.save()
+
+                const cashOut = new CashOut({ transaction: transaction._id, sender: personal._id, receiver: agent._id })
+                await cashOut.save()
+                return res.status(200).send(cashOut)
+            } else {
+                res.status(402).send('Insufficient Balance')
+            }
+        } else {
+            res.status(401).send('Incorrect Pincode')
+        }
+
+    } catch (e) {
+        res.send(e.message)
+    }
+})
 
 // merchant registration
 
