@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const User = require('../model/adminstration/user')
 const Agent = require('../model/agent/agent')
+const Client = require('../model/client')
 const AgentVerification = require('../model/agent/agent_verification')
 
 const jwt = require('jsonwebtoken')
@@ -78,8 +79,28 @@ router.get('/Agent', middleware, async(req, res) => {
     }
 })
 
-router.get('/Agent/:agentID', (req, res) => {
-    console.log(req.params.agentID)
+router.get('/Agent/:agentID', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_details', { agent, title: 'Agent Details', active: { agent: true } })
+        }
+    } catch (e) {
+        return res.render('agent_details', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
+
+router.post('/Agent/:agentID/updateClient', middleware, async(req, res) => {
+    console.log(req.body)
     res.send('')
 })
 
