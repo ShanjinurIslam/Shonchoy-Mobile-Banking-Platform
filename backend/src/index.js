@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const path = require('path')
 const hbs = require('hbs')
+const cookieParser = require('cookie-parser')
 
 // path setup
 const publicPath = path.join(__dirname, '../public')
@@ -23,12 +24,13 @@ const admin = require('./router/admin_panel')
 var app = express()
 
 // session
+app.use(cookieParser())
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }
+    cookie: { secure: true, path: '/', maxAge: 245600 }
 }))
 
 // bodyParser
