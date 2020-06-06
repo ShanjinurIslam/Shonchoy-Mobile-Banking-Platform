@@ -1,5 +1,8 @@
 const router = require('express').Router()
 const User = require('../model/adminstration/user')
+const Agent = require('../model/agent/agent')
+const AgentVerification = require('../model/agent/agent_verification')
+
 const jwt = require('jsonwebtoken')
 
 const middleware = async(req, res, next) => {
@@ -9,7 +12,7 @@ const middleware = async(req, res, next) => {
         if (user) {
             next()
         } else {
-            return res.render('index', { title: 'Shonchoy' })
+            return res.render('index', { title: 'Shonchoy', error: 'Please Log In' })
         }
     } catch (e) {
         return res.render('index', { title: 'Shonchoy', error: e.message })
@@ -26,7 +29,7 @@ router.get('', async(req, res) => {
             return res.render('index', { title: 'Shonchoy' })
         }
     } catch (e) {
-        return res.render('index', { title: 'Shonchoy', error: e.message })
+        return res.render('index', { title: 'Shonchoy' })
     }
 })
 
@@ -63,7 +66,21 @@ router.post('/logout', middleware, (req, res) => {
 })
 
 router.get('/home', middleware, (req, res) => {
-    return res.render('home', { title: 'Home', options: ['Personal', 'Agent', 'Merchant'] })
+    return res.render('home', { title: 'Home', options: ['Personal', 'Agent', 'Merchant'], active: { home: true } })
+})
+
+router.get('/Agent', middleware, async(req, res) => {
+    try {
+        const agents = await Agent.find({ verified: true })
+        return res.render('agent', { agents, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }], active: { agent: true } })
+    } catch (e) {
+        return res.render('agent', { error: e.message, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }], active: { agent: true } })
+    }
+})
+
+router.get('/Agent/:agentID', (req, res) => {
+    console.log(req.params.agentID)
+    res.send('')
 })
 
 module.exports = router

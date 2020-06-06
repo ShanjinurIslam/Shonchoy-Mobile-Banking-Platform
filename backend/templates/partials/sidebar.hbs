@@ -1,5 +1,5 @@
 <div class="list-group list-group-flush mt-2">
-    <a class="list-group-item list-group-item-action text-primary">
+    <a class="list-group-item list-group-item-action {{#if active.home}}text-primary{{/if}}" href="/home">
         <svg class="bi bi-house" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
@@ -18,7 +18,7 @@
         &nbsp;
         <b>Personal</b>
     </a>
-    <a class="list-group-item list-group-item-action">
+    <a class="list-group-item list-group-item-action {{#if active.agent}}text-primary{{/if}}" href="/Agent" >
         <svg class="bi bi-person-circle" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
             <path
