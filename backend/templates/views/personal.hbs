@@ -30,31 +30,6 @@
                                 </div>
                             </div>
                             {{/each}}
-                            <div class="container mt-4">
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Agent ID</th>
-                                            <th scope="col">Client ID</th>
-                                            <th scope="col">Mobile No</th>
-                                            <th scope="col">Trade Licence Number</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{#each agents}}
-                                        <tr>
-                                            <th scope="row">{{this._id}}</th>
-                                            <td>{{this.client}}</td>
-                                            <td>{{this.mobileNo}}</td>
-                                            <td>{{this.TLN}}</td>
-                                            <td><a class="btn btn-primary" href="/Agent/{{this._id}}">Details</button>
-                                            </td>
-                                        </tr>
-                                        {{/each}}
-                                    </tbody>
-                                </table>
-                            </div>
 
                         </div>
                     </div>

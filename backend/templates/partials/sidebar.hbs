@@ -10,7 +10,7 @@
         &nbsp;
         <b>Dashboard</b>
     </a>
-    <a class="list-group-item list-group-item-action">
+    <a class="list-group-item list-group-item-action {{#if active.personal}}text-primary{{/if}}" href="/Personal">
         <svg class="bi bi-person-fill" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
@@ -29,7 +29,7 @@
         &nbsp;
         <b>Agent</b>
     </a>
-    <a class="list-group-item list-group-item-action">
+    <a class="list-group-item list-group-item-action {{#if active.merchant}}text-primary{{/if}}" href="/Merchant">
         <svg class="bi bi-shop" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
@@ -44,6 +44,7 @@
         &nbsp;
         <b>Merchant</b>
     </a>
+    <!--
     <a class="list-group-item list-group-item-action">
         <svg class="bi bi-receipt" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
@@ -55,7 +56,8 @@
         &nbsp;
         <b>Statements</b>
     </a>
-    <a class="list-group-item list-group-item-action">
+    -->
+    <a class="list-group-item list-group-item-action {{#if active.settings}}text-primary{{/if}}" href="/Settings">
         <svg class="bi bi-gear-wide-connected" width="1em" height="1.5em" viewBox="0 2 16 16" fill="currentColor"
             xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"

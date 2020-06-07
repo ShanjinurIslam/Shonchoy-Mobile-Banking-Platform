@@ -44,6 +44,15 @@ userSchema.statics.authenticate = async function(username, password) {
     }
 }
 
+userSchema.methods.checkAuth = function(token) {
+    const user = this
+    const filtered = user.tokens.filter((tokens) => tokens.token == token)
+    if (filtered.length > 0) {
+        return true
+    }
+    return false
+}
+
 userSchema.methods.generateAuthToken = async function() {
     const user = this
     const token = jwt.sign({ _id: user._id }, 'abc123', { expiresIn: '2 days' })
