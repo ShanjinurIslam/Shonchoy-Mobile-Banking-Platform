@@ -88,7 +88,7 @@ router.post('/Agent/deposit', middleware, async(req, res) => {
     try {
         if (req.body.amount == req.body.confirmAmount) {
             const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
-            if (!agent) {
+            if (!agent || !agent.verified) {
                 throw new Error('No agent registered with this number')
             }
             const transactionType = "deposit"
@@ -113,7 +113,7 @@ router.post('/Agent/withdraw', middleware, async(req, res) => {
     try {
         if (req.body.amount == req.body.confirmAmount) {
             const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
-            if (!agent) {
+            if (!agent || !agent.verified) {
                 throw new Error('No agent registered with this number')
             }
             if (agent.balance < parseFloat(req.body.amount)) {
@@ -133,8 +133,49 @@ router.post('/Agent/withdraw', middleware, async(req, res) => {
     }
 })
 
-router.get('/Agent/verify', middleware, (req, res) => {
-    return res.render('agent_verification', { title: 'Agent Verification', active: { agent: true } })
+router.get('/Agent/verify', middleware, async(req, res) => {
+    const agents = await Agent.find({ verified: false })
+        /*
+        const pending = await AgentVerification.find({ agent: { $in: agents } })
+        console.log(pending)
+        */
+
+    return res.render('agent_verification', { agents, title: 'Agent Verification', active: { agent: true } })
+})
+
+router.get('/Agent/:agentID/verify', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        const agent_verification = await AgentVerification.findOne({ agent: agent._id })
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_verify', { agent, agent_verification, title: 'Agent Details', active: { agent: true } })
+        }
+    } catch (e) {
+        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
+
+router.post('/Agent/:agentID/verify', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            agent.verified = true
+            await agent.save()
+            return res.redirect('/Agent/verify')
+        }
+    } catch (e) {
+        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
 })
 
 router.get('/Agent/:agentID', middleware, async(req, res) => {
@@ -175,6 +216,62 @@ router.post('/Agent/:agentID/updateAgent', middleware, async(req, res) => {
     } catch (e) {
         console.log(e.message)
         res.redirect('/Agent/' + req.params.agentID)
+    }
+})
+
+router.get('/AgentVerification/:id/IDFront', middleware, async(req, res) => {
+    try {
+        const verification = await AgentVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.IDFront)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
+router.get('/AgentVerification/:id/IDBack', middleware, async(req, res) => {
+    try {
+        const verification = await AgentVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.IDBack)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
+router.get('/AgentVerification/:id/currentPhoto', middleware, async(req, res) => {
+    try {
+        const verification = await AgentVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.currentPhoto)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
+router.get('/AgentVerification/:id/tradeLicence', middleware, async(req, res) => {
+    try {
+        const verification = await AgentVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.tradeLicencePhoto)
+        }
+    } catch (e) {
+        res.status(404).send()
     }
 })
 
