@@ -19,15 +19,17 @@
                                 <h5>Basic Details</h5>
                                 <br />
                                 <form class="mr-4" action="/Agent/{{agent._id}}/updateClient" method="POST">
+                                    <input type="hidden" id="_id" name="_id" value="{{agent.client._id}}">
                                     <div class="form-group">
                                         <label for="name">Name</label>
-                                        <input name="name" type="text" class="form-control" id="name" value="{{agent.client.name}}">
+                                        <input name="name" type="text" class="form-control" id="name"
+                                            value="{{agent.client.name}}">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="name">Father/Husband's Name</label>
-                                        <input name="primaryGuardian" type="text" class="form-control" id="primaryGuardian"
-                                            value="{{agent.client.primaryGuardian}}">
+                                        <input name="primaryGuardian" type="text" class="form-control"
+                                            id="primaryGuardian" value="{{agent.client.primaryGuardian}}">
                                     </div>
 
                                     <div class="form-group">
@@ -52,7 +54,8 @@
 
                                     <div class="form-group">
                                         <label for="dob">Date of Birth</label>
-                                        <input name="dob" type="text" class="form-control" id="dob" value="{{agent.client.dob}}">
+                                        <input name="dob" type="text" class="form-control" id="dob"
+                                            value="{{agent.client.dob}}">
                                     </div>
 
                                     <div class="form-group">
@@ -63,7 +66,8 @@
 
                                     <div class="form-group">
                                         <label for="city">City</label>
-                                        <input name="city" type="text" class="form-control" id="city" value="{{agent.client.city}}">
+                                        <input name="city" type="text" class="form-control" id="city"
+                                            value="{{agent.client.city}}">
                                     </div>
 
                                     <div class="form-group">
@@ -95,16 +99,17 @@
                             <div class="col-6">
                                 <h5>Account Details</h5>
                                 <br />
-                                <form class="mr-4" action="/Agent/{{agent._id}}/updateAccount" method="POST">
+                                <form class="mr-4" action="/Agent/{{agent._id}}/updateAgent" method="POST">
+                                    <input type="hidden" id="_id" name="_id" value="{{agent._id}}">
                                     <div class="form-group">
                                         <label for="mobileNo">Mobile No</label>
-                                        <input type="text" class="form-control" id="mobileNo"
+                                        <input name="mobileNo" type="text" class="form-control" id="mobileNo"
                                             value="{{agent.mobileNo}}">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="TLN">Trade Licence Number</label>
-                                        <input type="text" class="form-control" id="TLN" value="{{agent.TLN}}">
+                                        <input name="TLN" type="text" class="form-control" id="TLN" value="{{agent.TLN}}">
                                     </div>
 
                                     <div class="form-group">
@@ -115,13 +120,13 @@
 
                                     <div class="form-group">
                                         <label for="businessOrganizationName">Business Organisation Name</label>
-                                        <input type="text" class="form-control" id="businessOrganizationName"
+                                        <input name="businessOrganizationName" type="text" class="form-control" id="businessOrganizationName"
                                             value="{{agent.businessOrganizationName}}">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="businessAddress">Business Organisation Address</label>
-                                        <input type="text" class="form-control" id="businessAddress"
+                                        <input name="businessAddress" type="text" class="form-control" id="businessAddress"
                                             value="{{agent.businessAddress}}">
                                     </div>
 

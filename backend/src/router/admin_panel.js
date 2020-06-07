@@ -3,6 +3,7 @@ const User = require('../model/adminstration/user')
 const Agent = require('../model/agent/agent')
 const Client = require('../model/client')
 const AgentVerification = require('../model/agent/agent_verification')
+const AgentTransaction = require('../model/adminstration/agent_transactions')
 
 const jwt = require('jsonwebtoken')
 
@@ -79,6 +80,63 @@ router.get('/Agent', middleware, async(req, res) => {
     }
 })
 
+router.get('/Agent/deposit', middleware, (req, res) => {
+    return res.render('agent_deposit', { title: 'Agent Deposit', active: { agent: true } })
+})
+
+router.post('/Agent/deposit', middleware, async(req, res) => {
+    try {
+        if (req.body.amount == req.body.confirmAmount) {
+            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
+            if (!agent) {
+                throw new Error('No agent registered with this number')
+            }
+            const transactionType = "deposit"
+            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
+            agent.balance = agent.balance + parseFloat(req.body.amount)
+            await agent_transaction.save()
+            await agent.save()
+            return res.render('agent_deposit', { success: agent_transaction, title: 'Agent Deposit', active: { agent: true } })
+        } else {
+            throw new Error('Amounts does not match')
+        }
+    } catch (e) {
+        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+    }
+})
+
+router.get('/Agent/withdraw', middleware, (req, res) => {
+    return res.render('agent_withdraw', { title: 'Agent Withdraw', active: { agent: true } })
+})
+
+router.post('/Agent/withdraw', middleware, async(req, res) => {
+    try {
+        if (req.body.amount == req.body.confirmAmount) {
+            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
+            if (!agent) {
+                throw new Error('No agent registered with this number')
+            }
+            if (agent.balance < parseFloat(req.body.amount)) {
+                throw new Error('Insufficient Balance')
+            }
+            const transactionType = "withdraw"
+            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
+            agent.balance = agent.balance - parseFloat(req.body.amount)
+            await agent_transaction.save()
+            await agent.save()
+            return res.render('agent_withdraw', { success: agent_transaction, title: 'Agent Withdraw', active: { agent: true } })
+        } else {
+            throw new Error('Amounts does not match')
+        }
+    } catch (e) {
+        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+    }
+})
+
+router.get('/Agent/verify', middleware, (req, res) => {
+    return res.render('agent_verification', { title: 'Agent Verification', active: { agent: true } })
+})
+
 router.get('/Agent/:agentID', middleware, async(req, res) => {
     try {
         const agent = await Agent.findById(req.params.agentID)
@@ -100,8 +158,24 @@ router.get('/Agent/:agentID', middleware, async(req, res) => {
 })
 
 router.post('/Agent/:agentID/updateClient', middleware, async(req, res) => {
-    console.log(req.body)
-    res.send('')
+    try {
+        await Client.findByIdAndUpdate(req.body._id, req.body, { new: true, runValidators: true })
+        res.redirect('/Agent/' + req.params.agentID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Agent/' + req.params.agentID)
+    }
+})
+
+router.post('/Agent/:agentID/updateAgent', middleware, async(req, res) => {
+    try {
+        console.log(req.body)
+        await Agent.findByIdAndUpdate(req.params.agentID, req.body, { new: true, runValidators: true })
+        res.redirect('/Agent/' + req.params.agentID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Agent/' + req.params.agentID)
+    }
 })
 
 module.exports = router
