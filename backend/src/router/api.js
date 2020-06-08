@@ -20,6 +20,7 @@ const MerchantVerification = require('../model/merchant/merchant_verification')
 
 const personalAuth = require('../middleware/personal_auth')
 const agentAuth = require('../middleware/agent_auth')
+const merchantAuth = require('../middleware/merchant_auth')
 
 // sendmoney
 
@@ -391,7 +392,7 @@ router.post('/merchant/registerAccount', async(req, res) => {
     try {
         const merchant = new Merchant(req.body)
         await merchant.save()
-        res.status(201).send(agent._id)
+        res.status(201).send(merchant._id)
     } catch (e) {
         res.status(502).send({ message: e.message })
     }
@@ -400,6 +401,7 @@ router.post('/merchant/registerAccount', async(req, res) => {
 var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }, { name: 'tradeLicencePhoto', maxCount: 1 }])
 
 router.post('/merchant/verifyAccount', cpUpload, async(req, res) => {
+    console.log(req.files)
     try {
         const merchantVerification = new MerchantVerification({
             personal: req.body.accountID,
@@ -409,13 +411,54 @@ router.post('/merchant/verifyAccount', cpUpload, async(req, res) => {
             tradeLicencePhoto: req.files.tradeLicencePhoto[0].buffer
         })
         await merchantVerification.save()
-        res.status(201).send(agentVerification._id)
+        res.status(201).send(merchantVerification._id)
     } catch (e) {
         res.status(502).send({ message: e.message })
     }
 })
 
 
+router.post('/merchant/login', async(req, res) => {
+    try {
+        const merchant = await Merchant.authenticate(req.body.mobileNo, req.body.pinCode)
+        if (!merchant.verified) {
+            res.status(200).send({ message: "Account Verification Still in Progress" })
+        } else {
+            const token = await merchant.generateAuthToken()
+            res.status(200).send({ merchant, token })
+        }
+    } catch (e) {
+        res.status(502).send({ message: e.message })
+    }
+})
 
+router.post('/merchant/logout', merchantAuth, async(req, res) => {
+    try {
+        const merchant = req.merchant;
+        const tokens = merchant.tokens.filter((tokens) => tokens.token != req.token)
+        merchant.tokens = tokens
+        await merchant.save()
+        res.status(200).send()
+    } catch (e) {
+        res.send(e.message)
+    }
+})
 
+router.post('/merchant/logoutAll', merchantAuth, async(req, res) => {
+    try {
+        const merchant = req.merchant;
+        merchant.tokens = []
+        await merchant.save()
+        res.status(200).send()
+    } catch (e) {
+        res.send(e.message)
+    }
+})
+
+router.get('/personal/statements', personalAuth, async(req, res) => {
+    const sendMoney = await Sendmoney.find({ $or: [{ 'sender': req.personal._id }, { 'receiver': req.personal._id }] })
+    const cashIn = await CashIn.find({ $or: [{ 'receiver': req.personal._id }] })
+    const cashOut = await CashOut.find({ $or: [{ 'sender': req.personal._id }] })
+    res.send({ sendMoney, cashIn, cashOut })
+})
 module.exports = router

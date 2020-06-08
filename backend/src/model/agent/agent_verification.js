@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const AgentVerificationSchema = new mongoose.Schema({
     agent: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Agent'
+        ref: 'Agent',
+        unique: true,
     },
     IDFront: {
         type: Buffer,

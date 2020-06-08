@@ -189,6 +189,96 @@ router.post('/Personal/:personalID/verify', middleware, async(req, res) => {
     }
 })
 
+router.get('/Personal/revoke', middleware, async(req, res) => {
+    const personals = await Personal.find({ locked: false })
+
+    return res.render('personal_revocation', { personals, title: 'Personal Verification', active: { personal: true } })
+})
+
+router.get('/Personal/:personalID/revoke', middleware, async(req, res) => {
+    try {
+        const personal = await Personal.findById(req.params.personalID)
+        const personal_verification = await PersonalVerification.findOne({ personal: personal._id })
+        if (!personal) {
+            throw new Error('Invalid personal')
+        } else {
+            const client = await Client.findById(personal.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                personal.client = client
+            }
+            return res.render('personal_revoke', { personal, personal_verification, title: 'Personal Revocation Details', active: { personal: true } })
+        }
+    } catch (e) {
+        return res.render('personal_revoke', { error: e.message, title: 'Personal Revocation Details', active: { personal: true } })
+    }
+})
+
+router.post('/Personal/:personalID/revoke', middleware, async(req, res) => {
+    try {
+        const personal = await Personal.findById(req.params.personalID)
+        if (!personal) {
+            throw new Error('Invalid Personal')
+        } else {
+            personal.locked = true
+            console.log(personal)
+            await personal.save()
+            return res.redirect('/Personal/revoke')
+        }
+    } catch (e) {
+        console.log(e.message)
+        return res.render('personal_revoke', { error: e.message, title: 'Personal Revoke Details', active: { personal: true } })
+    }
+})
+
+router.get('/Personal/reactivate', middleware, async(req, res) => {
+    const personals = await Personal.find({ locked: true })
+
+    return res.render('personal_reactivation', { personals, title: 'Personal Reactivate', active: { personal: true } })
+})
+
+router.get('/Personal/:personalID/reactivate', middleware, async(req, res) => {
+    try {
+        const personal = await Personal.findById(req.params.personalID)
+        const personal_verification = await PersonalVerification.findOne({ personal: personal._id })
+        if (!personal) {
+            throw new Error('Invalid personal')
+        } else {
+            const client = await Client.findById(personal.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                personal.client = client
+            }
+            return res.render('personal_reactivate', { personal, personal_verification, title: 'Personal Revocation Details', active: { personal: true } })
+        }
+    } catch (e) {
+        return res.render('personal_reactivate', { error: e.message, title: 'Personal Revocation Details', active: { personal: true } })
+    }
+})
+
+router.post('/Personal/:personalID/reactivate', middleware, async(req, res) => {
+    try {
+        const personal = await Personal.findById(req.params.personalID)
+        if (!personal) {
+            throw new Error('Invalid Personal')
+        } else {
+            personal.locked = false
+            await personal.save()
+            return res.redirect('/Personal/reactivate')
+        }
+    } catch (e) {
+        console.log(e.message)
+        return res.render('personal_reactivate', { error: e.message, title: 'Personal Revoke Details', active: { personal: true } })
+    }
+})
+
+
+
+
+
+
 // agent section
 
 router.get('/Agent/deposit', middleware, (req, res) => {
@@ -450,6 +540,155 @@ router.get('/AgentVerification/:id/tradeLicence', middleware, async(req, res) =>
         res.status(404).send()
     }
 })
+
+
+// Merchant Section 
+
+
+router.get('/Merchant/deposit', middleware, (req, res) => {
+    return res.render('merchant_deposit', { title: 'Merchant Deposit', active: { agent: true } })
+})
+
+router.post('/Agent/deposit', middleware, async(req, res) => {
+    try {
+        if (req.body.amount == req.body.confirmAmount) {
+            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
+            if (!agent || !agent.verified) {
+                throw new Error('No agent registered with this number')
+            }
+            const transactionType = "deposit"
+            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
+            agent.balance = agent.balance + parseFloat(req.body.amount)
+            await agent_transaction.save()
+            await agent.save()
+            return res.render('agent_deposit', { success: agent_transaction, title: 'Agent Deposit', active: { agent: true } })
+        } else {
+            throw new Error('Amounts does not match')
+        }
+    } catch (e) {
+        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+    }
+})
+
+router.get('/Agent/withdraw', middleware, (req, res) => {
+    return res.render('agent_withdraw', { title: 'Agent Withdraw', active: { agent: true } })
+})
+
+router.post('/Agent/withdraw', middleware, async(req, res) => {
+    try {
+        if (req.body.amount == req.body.confirmAmount) {
+            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
+            if (!agent || !agent.verified) {
+                throw new Error('No agent registered with this number')
+            }
+            if (agent.balance < parseFloat(req.body.amount)) {
+                throw new Error('Insufficient Balance')
+            }
+            const transactionType = "withdraw"
+            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
+            agent.balance = agent.balance - parseFloat(req.body.amount)
+            await agent_transaction.save()
+            await agent.save()
+            return res.render('agent_withdraw', { success: agent_transaction, title: 'Agent Withdraw', active: { agent: true } })
+        } else {
+            throw new Error('Amounts does not match')
+        }
+    } catch (e) {
+        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+    }
+})
+
+router.get('/Agent/verify', middleware, async(req, res) => {
+    const agents = await Agent.find({ verified: false })
+        /*
+        const pending = await AgentVerification.find({ agent: { $in: agents } })
+        console.log(pending)
+        */
+
+    return res.render('agent_verification', { agents, title: 'Agent Verification', active: { agent: true } })
+})
+
+router.get('/Agent/:agentID/verify', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        const agent_verification = await AgentVerification.findOne({ agent: agent._id })
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_verify', { agent, agent_verification, title: 'Agent Details', active: { agent: true } })
+        }
+    } catch (e) {
+        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
+
+router.post('/Agent/:agentID/verify', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            agent.verified = true
+            await agent.save()
+            return res.redirect('/Agent/verify')
+        }
+    } catch (e) {
+        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
+
+router.get('/Agent/:agentID', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_details', { agent, title: 'Agent Details', active: { agent: true } })
+        }
+    } catch (e) {
+        return res.render('agent_details', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

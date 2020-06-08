@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{>header}}
+
+    <body>
+        {{>navbar}}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-2">
+                    {{> sidebar}}
+                </div>
+                <div class="col-sm-10">
+                    <div class="container mt-4">
+                        <h3>Personal Revoke</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>Basic Details</h5>
+                                <br />
+                                <form class="mr-4">
+                                    <input readonly type="hidden" id="_id" name="_id" value="{{personal.client._id}}">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input readonly name="name" type="text" class="form-control" id="name"
+                                            value="{{personal.client.name}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">Father/Husband's Name</label>
+                                        <input readonly name="primaryGuardian" type="text" class="form-control"
+                                            id="primaryGuardian" value="{{personal.client.primaryGuardian}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">Mother's Name</label>
+                                        <input readonly name="motherName" type="text" class="form-control"
+                                            id="motherName" value="{{personal.client.motherName}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="input">IDType</label>
+                                        <select readonly name="IDType" id="IDType" class="form-control">
+                                            <option>{{personal.client.IDType}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">ID Number</label>
+                                        <input readonly name="IDNumber" type="text" class="form-control" id="IDNumber"
+                                            value="{{personal.client.IDNumber}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="dob">Date of Birth</label>
+                                        <input readonly name="dob" type="text" class="form-control" id="dob"
+                                            value="{{personal.client.dob}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address">Address</label>
+                                        <input readonly name="address" type="text" class="form-control" id="address"
+                                            value="{{personal.client.address}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input readonly name="city" type="text" class="form-control" id="city"
+                                            value="{{personal.client.city}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="subdistrict">Sub District</label>
+                                        <input readonly name="subdistrict" type="text" class="form-control"
+                                            id="subdistrict" value="{{personal.client.subdistrict}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="district">District</label>
+                                        <input readonly name="district" type="text" class="form-control" id="district"
+                                            value="{{personal.client.district}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="postOffice">Post Office</label>
+                                        <input readonly name="postOffice" type="text" class="form-control"
+                                            id="postOffice" value="{{personal.client.postOffice}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="postalCode">Postal Code</label>
+                                        <input readonly name="postalCode" type="text" class="form-control"
+                                            id="postalCode" value="{{personal.client.postalCode}}">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-6">
+                                <h5>Personal Details</h5>
+                                <br />
+                                <form class="mr-4">
+                                    <input readonly type="hidden" id="_id" name="_id" value="{{personal._id}}">
+                                    <div class="form-group">
+                                        <label for="mobileNo">Mobile No</label>
+                                        <input readonly name="mobileNo" type="text" class="form-control" id="mobileNo"
+                                            value="{{personal.mobileNo}}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="balance">Balance</label>
+                                        <input readonly type="text" readonly class="form-control" id="balance"
+                                            value="{{personal.balance}}">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="container mt-4 mb-2">
+                        <h3>Necessary Documents</h3>
+                        <br/>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>Current Photo</b>
+                            </div>
+                            <div class="col">
+                                <img src="/PersonalVerification/{{personal_verification._id}}/currentPhoto" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>ID Front</b>
+                            </div>
+                            <div class="col">
+                                <img src="/PersonalVerification/{{personal_verification._id}}/IDFront" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>ID Back</b>
+                            </div>
+                            <div class="col">
+                                <img src="/PersonalVerification/{{personal_verification._id}}/IDBack" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <form action="/Personal/{{personal._id}}/revoke" method="POST">
+                            <button class="btn btn-primary">Revoke</button>
+                        </form>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+
+    {{>footer}}
+    </body>
+</html>

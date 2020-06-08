@@ -30,7 +30,15 @@
                                 </div>
                             </div>
                             {{/each}}
+                            
                             <div class="container mt-4">
+                                <br />
+                                <div class="row">
+                                    <div class="col">
+                                        <input type="text" class="form-control float-right" id="searchField" placeholder="Enter Agent Mobile Number">
+                                    </div>
+                                </div>
+                                <br/>
                                 <table class="table table-borderless">
                                     <thead>
                                         <tr>
@@ -41,7 +49,7 @@
                                             <th scope="col"></th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="table">
                                         {{#each agents}}
                                         <tr>
                                             <th scope="row">{{this._id}}</th>
@@ -62,5 +70,5 @@
             </div>
     </body>
     {{> footer}}
-
+    <script src="/js/filter.js"></script>
 </html>

@@ -12,35 +12,32 @@
                 </div>
                 <div class="col-sm-10">
                     <div class="container mt-4">
-                        <h3>Agent Verification</h3>
+                        <h3>Personal Reactivation</h3>
                         <br />
-                        <h5>Unverified agents</h5>
+                        <h5>Locked Personal accounts</h5>
                         <br />
-
                         <div class="row">
                             <div class="col">
-                                <input type="text" class="form-control float-right" id="searchField" placeholder="Search Agent Number">
+                                <input type="text" class="form-control float-right" id="searchField" placeholder="Search Personal Mobile No">
                             </div>
                         </div>
-                        </br>
+                        <br/>
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th scope="col">Agent ID</th>
+                                    <th scope="col">Personal ID</th>
                                     <th scope="col">Client ID</th>
                                     <th scope="col">Mobile No</th>
-                                    <th scope="col">Trade Licence Number</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
                             <tbody id="table">
-                                {{#each agents}}
+                                {{#each personals}}
                                 <tr>
                                     <th scope="row">{{this._id}}</th>
                                     <td>{{this.client}}</td>
                                     <td>{{this.mobileNo}}</td>
-                                    <td>{{this.TLN}}</td>
-                                    <td><a class="btn btn-primary" href="/Agent/{{this._id}}/verify">Verify</button>
+                                    <td><a class="btn btn-primary" href="/Personal/{{this._id}}/reactivate">Reactivate</button>
                                     </td>
                                 </tr>
                                 {{/each}}
@@ -51,5 +48,6 @@
             </div>
         </div>
     </body>
-
+    {{>footer}}
+    <script src="/js/filter.js"></script>
 </html>

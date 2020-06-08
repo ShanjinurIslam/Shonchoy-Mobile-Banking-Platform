@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const MerchantVerificationSchema = new mongoose.Schema({
     accout: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Agent'
+        ref: 'Agent',
+        unique: true,
     },
     IDFront: {
         type: Buffer,
@@ -22,7 +23,7 @@ const MerchantVerificationSchema = new mongoose.Schema({
         required: true,
     },
     createdAt: {
-        type: Boolean,
+        type: Date,
         default: Date.now()
     }
 })
