@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{>header}}
+
+    <body>
+        {{>navbar}}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-2">
+                    {{> sidebar}}
+                </div>
+                <div class="col-sm-10">
+                    <div class="container mt-4">
+                        <h3>Agent Reactivation</h3>
+                        <br />
+                        <h5>Locked Agent accounts</h5>
+                        <br />
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control float-right" id="searchField" placeholder="Search Personal Mobile No">
+                            </div>
+                        </div>
+                        <br/>
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Personal ID</th>
+                                    <th scope="col">Client ID</th>
+                                    <th scope="col">Mobile No</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="table">
+                                {{#each agents}}
+                                <tr>
+                                    <th scope="row">{{this._id}}</th>
+                                    <td>{{this.client}}</td>
+                                    <td>{{this.mobileNo}}</td>
+                                    <td><a class="btn btn-primary" href="/Agent/{{this._id}}/reactivate">Reactivate</button>
+                                    </td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    {{>footer}}
+    <script src="/js/filter.js"></script>
+</html>

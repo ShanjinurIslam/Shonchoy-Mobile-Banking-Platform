@@ -96,9 +96,9 @@ router.get('/Personal', middleware, (req, res) => {
 router.get('/Agent', middleware, async(req, res) => {
     try {
         const agents = await Agent.find({ verified: true })
-        return res.render('agent', { agents, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }], active: { agent: true } })
+        return res.render('agent', { agents, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }, { name: 'Revoke', url: '/Agent/revoke' }, { name: 'Reactivate', url: '/Agent/reactivate' }], active: { agent: true } })
     } catch (e) {
-        return res.render('agent', { error: e.message, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }], active: { agent: true } })
+        return res.render('agent', { error: e.message, title: 'Agent', options: [{ name: 'Deposit', url: '/Agent/deposit' }, { name: 'Withdraw', url: '/Agent/withdraw' }, { name: 'Verify', url: '/Agent/verify' }, { name: 'Revoke', url: '/Agent/revoke' }, { name: 'Reactivate', url: '/Agent/reactivate' }], active: { agent: true } })
     }
 })
 
@@ -136,11 +136,6 @@ router.post('/user/update', middleware, async(req, res) => {
 
 router.get('/Personal/verify', middleware, async(req, res) => {
     const personals = await Personal.find({ verified: false })
-        /*
-        const pending = await AgentVerification.find({ agent: { $in: agents } })
-        console.log(pending)
-        */
-
     return res.render('personal_verification', { personals, title: 'Personal Verification', active: { personal: true } })
 })
 
@@ -272,6 +267,94 @@ router.post('/Personal/:personalID/reactivate', middleware, async(req, res) => {
 
 // agent section
 
+
+router.get('/Agent/revoke', middleware, async(req, res) => {
+    const agents = await Agent.find({ locked: false })
+
+    return res.render('agent_revocation', { agents, title: 'Agent Verification', active: { agent: true } })
+})
+
+router.get('/Agent/:agentID/revoke', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        const agent_verification = await AgentVerification.findOne({ agent: agent._id })
+        if (!agent) {
+            throw new Error('Invalid agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_revoke', { agent, agent_verification, title: 'Agent Revocation Details', active: { agent: true } })
+        }
+    } catch (e) {
+        console.log(e)
+        return res.render('agent_revoke', { error: e.message, title: 'Agent Revocation Details', active: { agent: true } })
+    }
+})
+
+router.post('/Agent/:agentID/revoke', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        console.log(agent)
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            agent.locked = true
+            console.log(agent)
+            await agent.save()
+            return res.redirect('/Agent/revoke')
+        }
+    } catch (e) {
+        console.log(e.message)
+        return res.render('agent_revoke', { error: e.message, title: 'Agent Revoke Details', active: { agent: true } })
+    }
+})
+
+
+router.get('/Agent/reactivate', middleware, async(req, res) => {
+    const agents = await Agent.find({ locked: true })
+    return res.render('agent_reactivation', { agents, title: 'Agent Reactivate', active: { agent: true } })
+})
+
+router.get('/Agent/:agentID/reactivate', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        const agent_verification = await AgentVerification.findOne({ agent: agent._id })
+        if (!agent) {
+            throw new Error('Invalid agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
+            } else {
+                agent.client = client
+            }
+            return res.render('agent_reactivate', { agent, agent_verification, title: 'Agent Reactivation Details', active: { agent: true } })
+        }
+    } catch (e) {
+        return res.render('agent_reactivate', { error: e.message, title: 'Agent Reactivation Details', active: { agent: true } })
+    }
+})
+
+router.post('/Agent/:agentID/reactivate', middleware, async(req, res) => {
+    try {
+        const agent = await Agent.findById(req.params.agentID)
+        if (!agent) {
+            throw new Error('Invalid agent')
+        } else {
+            agent.locked = false
+            await agent.save()
+            return res.redirect('/Agent/reactivate')
+        }
+    } catch (e) {
+        return res.render('agent_reactivate', { error: e.message, title: 'Agent Revoke Details', active: { agent: true } })
+    }
+})
+
+
 router.get('/Agent/deposit', middleware, (req, res) => {
     return res.render('agent_deposit', { title: 'Agent Deposit', active: { agent: true } })
 })
@@ -371,44 +454,24 @@ router.post('/Agent/:agentID/verify', middleware, async(req, res) => {
 })
 
 router.get('/Agent/:agentID', middleware, async(req, res) => {
-        try {
-            const agent = await Agent.findById(req.params.agentID)
+    try {
+        const agent = await Agent.findById(req.params.agentID)
 
-            if (!agent) {
-                throw new Error('Invalid Agent')
+        if (!agent) {
+            throw new Error('Invalid Agent')
+        } else {
+            const client = await Client.findById(agent.client)
+            if (!client) {
+                throw new Error('Invalid Client')
             } else {
-                const client = await Client.findById(agent.client)
-                if (!client) {
-                    throw new Error('Invalid Client')
-                } else {
-                    agent.client = client
-                }
-                return res.render('agent_details', { agent, title: 'Agent Details', active: { agent: true } })
+                agent.client = client
             }
-        } catch (e) {
-            return res.render('agent_details', { error: e.message, title: 'Agent Details', active: { agent: true } })
+            return res.render('agent_details', { agent, title: 'Agent Details', active: { agent: true } })
         }
-    })
-    /*
-    router.post('/Personal/:personalID/updateClient', middleware, async(req, res) => {
-        try {
-            await Personal.findByIdAndUpdate(req.body._id, req.body, { new: true, runValidators: true })
-            res.redirect('/Agent/' + req.params.agentID)
-        } catch (e) {
-            console.log(e.message)
-            res.redirect('/Agent/' + req.params.agentID)
-        }
-    })
-
-    router.post('/Personal/:personalID/updatePersonal', middleware, async(req, res) => {
-        try {
-            await Personal.findByIdAndUpdate(req.params.agentID, req.body, { new: true, runValidators: true })
-            res.redirect('/Agent/' + req.params.agentID)
-        } catch (e) {
-            console.log(e.message)
-            res.redirect('/Agent/' + req.params.agentID)
-        }
-    })*/
+    } catch (e) {
+        return res.render('agent_details', { error: e.message, title: 'Agent Details', active: { agent: true } })
+    }
+})
 
 
 router.post('/Agent/:agentID/updateClient', middleware, async(req, res) => {
@@ -431,6 +494,12 @@ router.post('/Agent/:agentID/updateAgent', middleware, async(req, res) => {
         res.redirect('/Agent/' + req.params.agentID)
     }
 })
+
+
+
+
+
+
 
 
 router.get('/PersonalVerification/:id/IDFront', middleware, async(req, res) => {
@@ -739,3 +808,28 @@ router.get('/MerchantVerification/:id/tradeLicence', middleware, async(req, res)
 
 
 module.exports = router
+
+
+
+/*
+Personal Modification
+
+router.post('/Personal/:personalID/updateClient', middleware, async(req, res) => {
+    try {
+        await Personal.findByIdAndUpdate(req.body._id, req.body, { new: true, runValidators: true })
+        res.redirect('/Agent/' + req.params.agentID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Agent/' + req.params.agentID)
+    }
+})
+
+router.post('/Personal/:personalID/updatePersonal', middleware, async(req, res) => {
+    try {
+        await Personal.findByIdAndUpdate(req.params.agentID, req.body, { new: true, runValidators: true })
+        res.redirect('/Agent/' + req.params.agentID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Agent/' + req.params.agentID)
+    }
+})*/

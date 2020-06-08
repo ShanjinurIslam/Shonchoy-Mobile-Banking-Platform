@@ -36,6 +36,10 @@ const agentSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    locked: {
+        type: Boolean,
+        default: false,
+    },
     verified: {
         type: Boolean,
         default: false
