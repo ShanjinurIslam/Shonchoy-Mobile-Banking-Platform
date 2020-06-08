@@ -102,15 +102,6 @@ router.get('/Agent', middleware, async(req, res) => {
     }
 })
 
-router.get('/Merchant', middleware, async(req, res) => {
-    try {
-        const merchants = await Merchant.find({})
-        return res.render('merchant', { merchants, title: 'Merchant', options: [{ name: 'Deposit', url: '/Merchant/deposit' }, { name: 'Withdraw', url: '/Merchant/withdraw' }, { name: 'Verify', url: '/Merchant/verify' }], active: { merchant: true } })
-    } catch (e) {
-        return res.render('merchant', { error: e.message, title: 'Merchant', options: [{ name: 'Deposit', url: '/Merchant/deposit' }, { name: 'Withdraw', url: '/Merchant/withdraw' }, { name: 'Verify', url: '/Merchant/verify' }], active: { merchant: true } })
-    }
-})
-
 router.get('/Settings', middleware, async(req, res) => {
     return res.render('settings', {
         user: req.session.user,
@@ -544,151 +535,206 @@ router.get('/AgentVerification/:id/tradeLicence', middleware, async(req, res) =>
 
 // Merchant Section 
 
-
-router.get('/Merchant/deposit', middleware, (req, res) => {
-    return res.render('merchant_deposit', { title: 'Merchant Deposit', active: { agent: true } })
+router.get('/Merchant', middleware, async(req, res) => {
+    try {
+        const merchants = await Merchant.find({ verified: true })
+        return res.render('merchant', { merchants, title: 'Merchant', options: [{ name: 'Deposit', url: '/Merchant/deposit' }, { name: 'Withdraw', url: '/Merchant/withdraw' }, { name: 'Verify', url: '/Merchant/verify' }], active: { merchant: true } })
+    } catch (e) {
+        return res.render('merchant', { error: e.message, title: 'Merchant', options: [{ name: 'Deposit', url: '/Merchant/deposit' }, { name: 'Withdraw', url: '/Merchant/withdraw' }, { name: 'Verify', url: '/Merchant/verify' }], active: { merchant: true } })
+    }
 })
 
-router.post('/Agent/deposit', middleware, async(req, res) => {
+
+router.get('/Merchant/deposit', middleware, (req, res) => {
+    return res.render('merchant_deposit', { title: 'Merchant Deposit', active: { merchant: true } })
+})
+
+router.post('/Merchant/deposit', middleware, async(req, res) => {
     try {
         if (req.body.amount == req.body.confirmAmount) {
-            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
-            if (!agent || !agent.verified) {
-                throw new Error('No agent registered with this number')
+            const merchant = await Merchant.findOne({ mobileNo: req.body.mobileNo })
+            if (!merchant || !merchant.verified) {
+                throw new Error('No merchant registered with this number')
             }
             const transactionType = "deposit"
-            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
-            agent.balance = agent.balance + parseFloat(req.body.amount)
-            await agent_transaction.save()
-            await agent.save()
-            return res.render('agent_deposit', { success: agent_transaction, title: 'Agent Deposit', active: { agent: true } })
+            const merchant_transaction = new MerchantTransaction({ transactionType: transactionType, merchant: merchant._id, amount: parseFloat(req.body.amount) })
+            merchant.balance = merchant.balance + parseFloat(req.body.amount)
+            await merchant_transaction.save()
+            await merchant.save()
+            return res.render('merchant_deposit', { success: agent_transaction, title: 'Merchant Deposit', active: { merchant: true } })
         } else {
             throw new Error('Amounts does not match')
         }
     } catch (e) {
-        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+        return res.render('merchant_deposit', { error: e.message, title: 'Merchant Deposit', active: { merchant: true } })
     }
 })
 
-router.get('/Agent/withdraw', middleware, (req, res) => {
-    return res.render('agent_withdraw', { title: 'Agent Withdraw', active: { agent: true } })
+router.get('/Merchant/withdraw', middleware, (req, res) => {
+    return res.render('merchant_withdraw', { title: 'Merchant Withdraw', active: { merchant: true } })
 })
 
-router.post('/Agent/withdraw', middleware, async(req, res) => {
+router.post('/Merchant/withdraw', middleware, async(req, res) => {
     try {
         if (req.body.amount == req.body.confirmAmount) {
-            const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
-            if (!agent || !agent.verified) {
-                throw new Error('No agent registered with this number')
+            const merchant = await Merchant.findOne({ mobileNo: req.body.mobileNo })
+            if (!merchant || !merchant.verified) {
+                throw new Error('No merchant registered with this number')
             }
-            if (agent.balance < parseFloat(req.body.amount)) {
+            if (merchant.balance < parseFloat(req.body.amount)) {
                 throw new Error('Insufficient Balance')
             }
             const transactionType = "withdraw"
-            const agent_transaction = new AgentTransaction({ transactionType: transactionType, agent: agent._id, amount: parseFloat(req.body.amount) })
-            agent.balance = agent.balance - parseFloat(req.body.amount)
-            await agent_transaction.save()
-            await agent.save()
-            return res.render('agent_withdraw', { success: agent_transaction, title: 'Agent Withdraw', active: { agent: true } })
+            const merchant_transaction = new MerchantTransaction({ transactionType: transactionType, merchant: merchant._id, amount: parseFloat(req.body.amount) })
+            merchant.balance = merchant.balance - parseFloat(req.body.amount)
+            await merchant_transaction.save()
+            await merchant.save()
+            return res.render('merchant_withdraw', { success: merchant_transaction, title: 'Merchant Withdraw', active: { agent: true } })
         } else {
             throw new Error('Amounts does not match')
         }
     } catch (e) {
-        return res.render('agent_deposit', { error: e.message, title: 'Agent Deposit', active: { agent: true } })
+        return res.render('merchant_withdraw', { error: e.message, title: 'Merchant Withdraw', active: { agent: true } })
     }
 })
 
-router.get('/Agent/verify', middleware, async(req, res) => {
-    const agents = await Agent.find({ verified: false })
-        /*
-        const pending = await AgentVerification.find({ agent: { $in: agents } })
-        console.log(pending)
-        */
-
-    return res.render('agent_verification', { agents, title: 'Agent Verification', active: { agent: true } })
+router.get('/Merchant/verify', middleware, async(req, res) => {
+    const merchants = await Merchant.find({ verified: false })
+    return res.render('merchant_verification', { merchants, title: 'Merchant Verification', active: { merchant: true } })
 })
 
-router.get('/Agent/:agentID/verify', middleware, async(req, res) => {
+router.get('/Merchant/:merchantID/verify', middleware, async(req, res) => {
     try {
-        const agent = await Agent.findById(req.params.agentID)
-        const agent_verification = await AgentVerification.findOne({ agent: agent._id })
-        if (!agent) {
-            throw new Error('Invalid Agent')
+        const merchant = await Merchant.findById(req.params.merchantID)
+        const merchant_verification = await MerchantVerification.findOne({ merchant: merchant._id })
+        console.log(merchant_verification)
+        if (!merchant) {
+            throw new Error('Invalid Merchant')
         } else {
-            const client = await Client.findById(agent.client)
+            const client = await Client.findById(merchant.client)
             if (!client) {
                 throw new Error('Invalid Client')
             } else {
-                agent.client = client
+                merchant.client = client
             }
-            return res.render('agent_verify', { agent, agent_verification, title: 'Agent Details', active: { agent: true } })
+            return res.render('merchant_verify', { merchant, merchant_verification, title: 'Merchant Details', active: { merchant: true } })
         }
     } catch (e) {
-        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+        return res.render('merchant_verify', { merchant: e.message, title: 'Merchant Details', active: { merchant: true } })
     }
 })
 
-router.post('/Agent/:agentID/verify', middleware, async(req, res) => {
+router.post('/Merchant/:merchantID/verify', middleware, async(req, res) => {
     try {
-        const agent = await Agent.findById(req.params.agentID)
-        if (!agent) {
+        const merchant = await Merchant.findById(req.params.merchantID)
+        if (!merchant) {
             throw new Error('Invalid Agent')
         } else {
-            agent.verified = true
-            await agent.save()
-            return res.redirect('/Agent/verify')
+            merchant.verified = true
+            await merchant.save()
+            return res.redirect('/Merchant/verify')
         }
     } catch (e) {
-        return res.render('agent_verify', { error: e.message, title: 'Agent Details', active: { agent: true } })
+        return res.render('merchant_verify', { error: e.message, title: 'Merchant Details', active: { merchant: true } })
     }
 })
 
-router.get('/Agent/:agentID', middleware, async(req, res) => {
-    try {
-        const agent = await Agent.findById(req.params.agentID)
 
-        if (!agent) {
-            throw new Error('Invalid Agent')
+router.get('/Merchant/:merchantID', middleware, async(req, res) => {
+    try {
+        const merchant = await Merchant.findById(req.params.merchantID)
+
+        if (!merchant) {
+            throw new Error('Invalid merchant')
         } else {
-            const client = await Client.findById(agent.client)
+            const client = await Client.findById(merchant.client)
             if (!client) {
                 throw new Error('Invalid Client')
             } else {
-                agent.client = client
+                merchant.client = client
             }
-            return res.render('agent_details', { agent, title: 'Agent Details', active: { agent: true } })
+            return res.render('merchant_details', { merchant, title: 'Merchant Details', active: { merchant: true } })
         }
     } catch (e) {
-        return res.render('agent_details', { error: e.message, title: 'Agent Details', active: { agent: true } })
+        return res.render('merchant_details', { error: e.message, title: 'Merchant Details', active: { merchant: true } })
     }
 })
 
+router.post('/Merchant/:merchantID/updateClient', middleware, async(req, res) => {
+    try {
+        await Client.findByIdAndUpdate(req.body._id, req.body, { new: true, runValidators: true })
+        res.redirect('/Merchant/' + req.params.merchantID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Merchant/' + req.params.merchantID)
+    }
+})
 
+router.post('/Merchant/:merchantID/updateMerchant', middleware, async(req, res) => {
+    try {
+        await Merchant.findByIdAndUpdate(req.params.merchantID, req.body, { new: true, runValidators: true })
+        res.redirect('/Merchant/' + req.params.merchantID)
+    } catch (e) {
+        console.log(e.message)
+        res.redirect('/Merchant/' + req.params.merchantID)
+    }
+})
 
+router.get('/MerchantVerification/:id/IDFront', middleware, async(req, res) => {
+    try {
+        const verification = await MerchantVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.IDFront)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
 
+router.get('/MerchantVerification/:id/IDBack', middleware, async(req, res) => {
+    try {
+        const verification = await MerchantVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.IDBack)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
 
+router.get('/MerchantVerification/:id/currentPhoto', middleware, async(req, res) => {
+    try {
+        const verification = await MerchantVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.currentPhoto)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+router.get('/MerchantVerification/:id/tradeLicence', middleware, async(req, res) => {
+    try {
+        const verification = await MerchantVerification.findById(req.params.id)
+        if (!verification) {
+            throw new Error()
+        } else {
+            res.set('Content-Type', 'image/jpg')
+            res.send(verification.tradeLicencePhoto)
+        }
+    } catch (e) {
+        res.status(404).send()
+    }
+})
 
 
 

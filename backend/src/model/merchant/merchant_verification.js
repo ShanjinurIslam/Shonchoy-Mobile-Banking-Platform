@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 
 const MerchantVerificationSchema = new mongoose.Schema({
-    accout: {
+    merchant: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Agent',
+        ref: 'Merchant',
         unique: true,
     },
     IDFront: {

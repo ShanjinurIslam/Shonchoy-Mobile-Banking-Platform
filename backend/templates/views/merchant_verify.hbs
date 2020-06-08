@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {{>header}}
+
+    <body>
+        {{>navbar}}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-2">
+                    {{> sidebar}}
+                </div>
+                <div class="col-sm-10">
+                    <div class="container mt-4">
+                        <h3>Merchant Verify</h3>
+                        <br />
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>Basic Details</h5>
+                                <br />
+                                <form class="mr-4" action="/Merchant/{{merchant._id}}/updateClient" method="POST">
+                                    <input readonly type="hidden" id="_id" name="_id" value="{{merchant.client._id}}">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input readonly name="name" type="text" class="form-control" id="name"
+                                            value="{{merchant.client.name}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">Father/Husband's Name</label>
+                                        <input readonly name="primaryGuardian" type="text" class="form-control"
+                                            id="primaryGuardian" value="{{merchant.client.primaryGuardian}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">Mother's Name</label>
+                                        <input readonly name="motherName" type="text" class="form-control"
+                                            id="motherName" value="{{merchant.client.motherName}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="input">IDType</label>
+                                        <select readonly name="IDType" id="IDType" class="form-control">
+                                            <option>{{merchant.client.IDType}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="name">ID Number</label>
+                                        <input readonly name="IDNumber" type="text" class="form-control" id="IDNumber"
+                                            value="{{merchant.client.IDNumber}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="dob">Date of Birth</label>
+                                        <input readonly name="dob" type="text" class="form-control" id="dob"
+                                            value="{{merchant.client.dob}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address">Address</label>
+                                        <input readonly name="address" type="text" class="form-control" id="address"
+                                            value="{{merchant.client.address}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <input readonly name="city" type="text" class="form-control" id="city"
+                                            value="{{merchant.client.city}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="subdistrict">Sub District</label>
+                                        <input readonly name="subdistrict" type="text" class="form-control"
+                                            id="subdistrict" value="{{merchant.client.subdistrict}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="district">District</label>
+                                        <input readonly name="district" type="text" class="form-control" id="district"
+                                            value="{{merchant.client.district}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="postOffice">Post Office</label>
+                                        <input readonly name="postOffice" type="text" class="form-control"
+                                            id="postOffice" value="{{merchant.client.postOffice}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="postalCode">Postal Code</label>
+                                        <input readonly name="postalCode" type="text" class="form-control"
+                                            id="postalCode" value="{{merchant.client.postalCode}}">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-6">
+                                <h5>Account Details</h5>
+                                <br />
+                                <form class="mr-4" action="/Merchant/{{merchant._id}}/updateMerchant" method="POST">
+                                    <input readonly type="hidden" id="_id" name="_id" value="{{merchant._id}}">
+                                    <div class="form-group">
+                                        <label for="mobileNo">Mobile No</label>
+                                        <input readonly name="mobileNo" type="text" class="form-control" id="mobileNo"
+                                            value="{{merchant.mobileNo}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="TLN">Trade Licence Number</label>
+                                        <input readonly name="TLN" type="text" class="form-control" id="TLN"
+                                            value="{{merchant.TLN}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="balance">Balance</label>
+                                        <input readonly type="text" readonly class="form-control" id="balance"
+                                            value="{{merchant.balance}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="businessOrganizationName">Business Organisation Name</label>
+                                        <input readonly name="businessOrganizationName" type="text" class="form-control"
+                                            id="businessOrganizationName" value="{{merchant.businessOrganizationName}}">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="businessAddress">Business Organisation Address</label>
+                                        <input readonly name="businessAddress" type="text" class="form-control"
+                                            id="businessAddress" value="{{merchant.businessAddress}}">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="container mt-4 mb-2">
+                        <h3>Necessary Documents</h3>
+                        <br/>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>Current Photo</b>
+                            </div>
+                            <div class="col">
+                                <img src="/MerchantVerification/{{merchant_verification._id}}/currentPhoto" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>ID Front</b>
+                            </div>
+                            <div class="col">
+                                <img src="/MerchantVerification/{{merchant_verification._id}}/IDFront" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>ID Back</b>
+                            </div>
+                            <div class="col">
+                                <img src="/MerchantVerification/{{merchant_verification._id}}/IDBack" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col">
+                                <b>Trade Licence</b>
+                            </div>
+                            <div class="col">
+                                <img src="/MerchantVerification/{{merchant_verification._id}}/tradeLicence" height="200"
+                                    width="200">
+                            </div>
+                        </div>
+                        <form action="/merchant/{{merchant._id}}/verify" method="POST">
+                            <button class="btn btn-primary">Verify</button>
+                        </form>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </body>
+
+</html>

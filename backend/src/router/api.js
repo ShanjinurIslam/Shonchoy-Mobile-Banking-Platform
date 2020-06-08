@@ -404,7 +404,7 @@ router.post('/merchant/verifyAccount', cpUpload, async(req, res) => {
     console.log(req.files)
     try {
         const merchantVerification = new MerchantVerification({
-            personal: req.body.accountID,
+            merchant: req.body.accountID,
             IDFront: req.files.IDFront[0].buffer,
             IDBack: req.files.IDBack[0].buffer,
             currentPhoto: req.files.currentPhoto[0].buffer,
