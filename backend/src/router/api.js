@@ -124,7 +124,8 @@ router.post('/personal/login', async(req, res) => {
             res.status(200).send({ message: "Account Verification Still in Progress" })
         } else {
             const token = await personal.generateAuthToken()
-            res.status(200).send({ personal, token })
+            const client = await Client.findById(personal.client);
+            res.status(200).send({ _id: personal._id.toString(), client: client, mobileNo: personal.mobileNo, balance: parseFloat(personal.balance), token: token })
         }
     } catch (e) {
         res.status(502).send(e.message)

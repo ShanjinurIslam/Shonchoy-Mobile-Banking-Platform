@@ -5,6 +5,7 @@ const session = require('express-session')
 const path = require('path')
 const hbs = require('hbs')
 const cookieParser = require('cookie-parser')
+const http = require('http')
 
 // path setup
 const publicPath = path.join(__dirname, '../public')
@@ -64,6 +65,9 @@ hbs.registerHelper('toLowerCase', function(str) {
 app.use('/api', api)
 app.use('', admin)
 
-app.listen(3000, () => {
-    console.log('Server started at Port 3000')
+const server = http.createServer(app)
+server.listen(3000, '127.0.0.1', function() {
+    server.close(function() {
+        server.listen(8080, '192.168.0.102')
+    })
 })
