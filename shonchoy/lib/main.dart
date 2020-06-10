@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:shonchoy/routes.dart';
+import 'package:shonchoy/scoped_model/my_model.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,14 +19,16 @@ class MyApp extends StatelessWidget {
             currentFocus.focusedChild.unfocus();
           }
         },
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            fontFamily: 'ProductSans',
-            primarySwatch: Colors.green,
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-          ),
-          routes: routes,
-        ));
+        child: new ScopedModel<MyModel>(
+            model: new MyModel(),
+            child: MaterialApp(
+              title: 'Flutter Demo',
+              theme: ThemeData(
+                fontFamily: 'ProductSans',
+                primarySwatch: Colors.green,
+                visualDensity: VisualDensity.adaptivePlatformDensity,
+              ),
+              routes: routes,
+            )));
   }
 }

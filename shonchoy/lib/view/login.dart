@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:shonchoy/controller/AuthController.dart';
 import 'package:shonchoy/model/personal.dart';
+import 'package:shonchoy/scoped_model/my_model.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -126,10 +128,9 @@ class LogInScreenState extends State<LogInScreen> {
                                   });
                                   try {
                                     Personal personal = await AuthController()
-                                        .logIn(
-                                            mobileNo.text,
-                                            pinCode
-                                                .text); // I have to save this into scoped model
+                                        .logIn(mobileNo.text, pinCode.text);
+                                    ScopedModel.of<MyModel>(context)
+                                        .setPersonal(personal);
                                     Navigator.pushReplacementNamed(
                                         context, '/home');
                                   } catch (e) {
@@ -178,7 +179,10 @@ class LogInScreenState extends State<LogInScreen> {
                             style: TextStyle(color: Colors.grey),
                           ),
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.pushReplacementNamed(
+                                  context, '/signup');
+                            },
                             child: Text(
                               'Sign Up',
                               style: TextStyle(color: Colors.green),
