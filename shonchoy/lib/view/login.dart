@@ -127,8 +127,9 @@ class LogInScreenState extends State<LogInScreen> {
                                     isLoading = true;
                                   });
                                   try {
-                                    Personal personal = await AuthController()
-                                        .logIn(mobileNo.text, pinCode.text);
+                                    Personal personal =
+                                        await AuthController.logIn(
+                                            mobileNo.text, pinCode.text);
                                     ScopedModel.of<MyModel>(context)
                                         .setPersonal(personal);
                                     Navigator.pushReplacementNamed(

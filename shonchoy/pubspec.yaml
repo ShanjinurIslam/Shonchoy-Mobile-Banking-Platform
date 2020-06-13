@@ -32,8 +32,8 @@ dependencies:
   http: ^0.12.1
   camera: ^0.5.8+2
   path_provider: 
-  path: 
-  image_crop:
+  path:
+  intl:
 
 dev_dependencies:
   flutter_test:

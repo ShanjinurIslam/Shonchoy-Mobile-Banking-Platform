@@ -5,7 +5,7 @@ import 'package:shonchoy/model/personal.dart';
 import 'package:shonchoy/statics.dart';
 
 class AuthController {
-  Future<Personal> logIn(String mobileNo, String pinCode) async {
+  static Future<Personal> logIn(String mobileNo, String pinCode) async {
     final http.Response response = await http.post(
       LOGIN_URL,
       headers: <String, String>{
@@ -20,5 +20,16 @@ class AuthController {
     } else {
       throw new Exception(response.body.toString());
     }
+  }
+
+  static Future<int> checkNumber(String mobileNo) async {
+    final http.Response response = await http.post(
+      CHECK_NUMBER_URL,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'mobileNo': mobileNo}),
+    );
+    return response.statusCode;
   }
 }

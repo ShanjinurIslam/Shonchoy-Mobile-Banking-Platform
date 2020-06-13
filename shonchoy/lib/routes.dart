@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shonchoy/view/form_fillup.dart';
 import 'package:shonchoy/view/home.dart';
 import 'package:shonchoy/view/login.dart';
 import 'package:shonchoy/view/signup.dart';
@@ -11,4 +12,5 @@ final routes = {
   '/home': (BuildContext context) => Home(),
   '/signup': (BuildContext context) => SignUp(),
   '/takephoto': (BuildContext context) => TakePhoto(),
+  '/fillupform': (BuildContext context) => FormFillup()
 };
