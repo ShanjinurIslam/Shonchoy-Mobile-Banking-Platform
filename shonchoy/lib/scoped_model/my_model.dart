@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shonchoy/model/personal.dart';
@@ -16,6 +18,10 @@ class MyModel extends Model {
   TextEditingController district = new TextEditingController();
   TextEditingController postOffice = new TextEditingController();
   TextEditingController postCode = new TextEditingController();
+
+  File idFront;
+  File idBack;
+  File currentPhoto;
 
   String idType = "Select ID Type";
 

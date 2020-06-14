@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class PhotoInstruction extends StatelessWidget {
+class ApplyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class PhotoInstruction extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Now let\'s take photos',
+                  'Success!',
                   style: TextStyle(color: Colors.green, fontSize: 32),
                 ),
               ),
@@ -30,14 +30,8 @@ class PhotoInstruction extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                        'You have to take 2 photos! Front and back of ID Card'),
+                        'Your application is submitted to the authority. You would be notified via SMS with 48 Hours'),
                   ),
-                  Image.asset(
-                    'images/idfront.jpg',
-                  ),
-                  Image.asset(
-                    'images/idback.jpg',
-                  )
                 ],
               ),
             ),
@@ -52,13 +46,14 @@ class PhotoInstruction extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/takephoto');
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/login", (r) => false);
                 },
                 child: Container(
                   height: 50,
                   child: Center(
                     child: Text(
-                      'Next',
+                      'Back to home',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

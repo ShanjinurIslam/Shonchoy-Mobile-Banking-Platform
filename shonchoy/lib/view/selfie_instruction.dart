@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class PhotoInstruction extends StatelessWidget {
+class SelfieInstruction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class PhotoInstruction extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Now let\'s take photos',
+                  'Now let\'s take selfi',
                   style: TextStyle(color: Colors.green, fontSize: 32),
                 ),
               ),
@@ -30,14 +30,13 @@ class PhotoInstruction extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                        'You have to take 2 photos! Front and back of ID Card'),
+                        'You have to take your selfi. Photo should be clear'),
                   ),
+                  Spacer(),
                   Image.asset(
-                    'images/idfront.jpg',
+                    'images/selfie.gif',
                   ),
-                  Image.asset(
-                    'images/idback.jpg',
-                  )
+                  Spacer(),
                 ],
               ),
             ),
@@ -52,7 +51,7 @@ class PhotoInstruction extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/takephoto');
+                  Navigator.pushNamed(context, '/takeselfie');
                 },
                 child: Container(
                   height: 50,

@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shonchoy/scoped_model/my_model.dart';
@@ -211,6 +212,7 @@ class FormFillupState extends State<FormFillup> {
                     : () {
                         try {
                           ScopedModel.of<MyModel>(context).checkValidity();
+                          Navigator.pushNamed(context, '/photoinstruction');
                         } catch (e) {
                           Widget okButton = FlatButton(
                             child: Text("OK"),

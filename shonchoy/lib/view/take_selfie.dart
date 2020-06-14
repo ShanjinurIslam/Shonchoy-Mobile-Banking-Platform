@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:image/image.dart' as DartImage;
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,16 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shonchoy/scoped_model/my_model.dart';
 
-class TakePhoto extends StatefulWidget {
+class TakeSelfie extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return new TakePhotoState();
+    return new TakeSelfieState();
   }
 }
 
-class TakePhotoState extends State<TakePhoto> {
-  int photoNumber = 0;
-
+class TakeSelfieState extends State<TakeSelfie> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
 
@@ -26,7 +23,6 @@ class TakePhotoState extends State<TakePhoto> {
   var imagePath;
 
   void onCaptureButtonPressed(BuildContext context, GlobalKey key) async {
-    //on camera button press
     try {
       final path = join(
         (await getTemporaryDirectory()).path, //Temporary path
@@ -35,25 +31,11 @@ class TakePhotoState extends State<TakePhoto> {
       imagePath = path;
       await _controller.takePicture(path); //take photo
 
-      RenderBox box = key.currentContext.findRenderObject();
-      Offset position = box.localToGlobal(Offset.zero);
-      var image = DartImage.decodeImage(File(imagePath).readAsBytesSync());
-      var rotate = DartImage.copyRotate(image, 90);
-      var cropped = DartImage.copyCrop(
-          rotate, position.dx.toInt(), position.dy.toInt(), 700, 500);
-      File(imagePath)..writeAsBytesSync(DartImage.encodePng(cropped));
+      ScopedModel.of<MyModel>(context).currentPhoto = new File(imagePath);
 
-      if (photoNumber == 0) {
-        ScopedModel.of<MyModel>(context).idFront = new File(imagePath);
-        print(ScopedModel.of<MyModel>(context).idFront);
-      } else {
-        ScopedModel.of<MyModel>(context).idBack = new File(imagePath);
-        print(ScopedModel.of<MyModel>(context).idBack);
-      }
       setState(() {
         showCapturedPhoto = true;
       });
-
     } catch (e) {
       print(e);
     }
@@ -61,7 +43,7 @@ class TakePhotoState extends State<TakePhoto> {
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
-    final firstCamera = cameras.first;
+    final firstCamera = cameras[1];
     _controller = CameraController(firstCamera, ResolutionPreset.high);
     _initializeControllerFuture = _controller.initialize();
     if (!mounted) {
@@ -103,7 +85,7 @@ class TakePhotoState extends State<TakePhoto> {
                   child: Padding(
                     padding: EdgeInsets.all(24),
                     child: Text(
-                      photoNumber==0? 'ID Front':'ID Back',
+                      'Current Photo',
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
@@ -112,6 +94,7 @@ class TakePhotoState extends State<TakePhoto> {
                 Center(
                   child: Image.file(
                     File(imagePath),
+                    scale: 2,
                   ),
                 ),
                 Spacer(),
@@ -131,15 +114,7 @@ class TakePhotoState extends State<TakePhoto> {
                         )),
                     FlatButton(
                       onPressed: () {
-                        photoNumber++;
-                        if (photoNumber == 1) {
-                          setState(() {
-                            showCapturedPhoto = false;
-                          });
-                        }
-                        else{
-                          Navigator.pushNamed(context, '/selfieinstruction');
-                        }
+                        Navigator.pushNamed(context, '/apply');
                       },
                       child: Text(
                         'Next',
@@ -163,36 +138,6 @@ class TakePhotoState extends State<TakePhoto> {
                           child: Stack(
                             children: <Widget>[
                               CameraPreview(_controller),
-                              Align(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Container(
-                                      key: key,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey,
-                                          width:
-                                              1, //                   <--- border width here
-                                        ),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      height: 200,
-                                      width: MediaQuery.of(context).size.width *
-                                          .75,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: Text(
-                                        'Place ID inside this frame',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                alignment: Alignment.center,
-                              ),
                               Padding(
                                 padding: EdgeInsets.all(24),
                                 child: Align(

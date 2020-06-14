@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shonchoy/view/apply.dart';
 import 'package:shonchoy/view/form_fillup.dart';
 import 'package:shonchoy/view/home.dart';
 import 'package:shonchoy/view/login.dart';
+import 'package:shonchoy/view/photo_instruction.dart';
+import 'package:shonchoy/view/selfie_instruction.dart';
 import 'package:shonchoy/view/signup.dart';
 import 'package:shonchoy/view/splash.dart';
 import 'package:shonchoy/view/take_photo.dart';
+import 'package:shonchoy/view/take_selfie.dart';
 
 final routes = {
   '/': (BuildContext context) => SplashScreen(),
@@ -12,5 +16,9 @@ final routes = {
   '/home': (BuildContext context) => Home(),
   '/signup': (BuildContext context) => SignUp(),
   '/takephoto': (BuildContext context) => TakePhoto(),
-  '/fillupform': (BuildContext context) => FormFillup()
+  '/takeselfie': (BuildContext context) => TakeSelfie(),
+  '/fillupform': (BuildContext context) => FormFillup(),
+  '/photoinstruction': (BuildContext context) => PhotoInstruction(),
+  '/selfieinstruction': (BuildContext context) => SelfieInstruction(),
+  '/apply': (BuildContext context) => ApplyPage()
 };
