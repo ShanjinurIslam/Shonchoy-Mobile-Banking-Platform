@@ -32,12 +32,13 @@ const CashOut = require('../model/adminstration/cash_out')
 
 const nexmo = require('../config/nexmo')
 var multer = require('multer')
+const { collection } = require('../model/client')
 var storage = multer.memoryStorage()
 var upload = multer({ dest: 'uploads/', storage: storage })
 
 // personal
 router.post('/personal/mobile', async(req, res) => {
-    const personal = await Personal.findOne({ mobileNo: '88' + req.body.mobileNo })
+    const personal = await Personal.findOne({ mobileNo: req.body.mobileNo })
     if (!personal) {
         res.status(200).send({ message: 'This number is not linked to any account' })
     } else {
@@ -76,12 +77,17 @@ router.post('/personal/mobile/cancel', async(req, res) => {
 })
 
 // client registration
-
+/*
 router.post('/personal/registerClient', async(req, res) => {
     try {
-        const client = new Client(req.body)
-        await client.save()
-        res.status(201).send({ client_id: client._id })
+        const client = await Client.findOne({ IDNumber: req.body.IDNumber })
+        if (client) {
+            res.status(201).send({ client_id: client._id })
+        } else {
+            const client = new Client(req.body)
+            await client.save()
+            res.status(201).send({ client_id: client._id })
+        }
     } catch (e) {
         res.status(502).send({ message: e.message })
     }
@@ -98,11 +104,50 @@ router.post('/personal/registerAccount', async(req, res) => {
         res.status(502).send({ message: e.message })
     }
 })
-
+*/
 // add personal account Verification
-var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }])
+var cpUpload = upload.fields([{ name: 'name', maxCount: 1 },
+    { name: 'primaryGuardian', maxCount: 1 },
+    { name: 'motherName', maxCount: 1 },
+    { name: 'IDType', maxCount: 1 },
+    { name: 'IDNumber', maxCount: 1 },
+    { name: 'dob', maxCount: 1 },
+    { name: 'address', maxCount: 1 },
+    { name: 'city', maxCount: 1 },
+    { name: 'subdistrict', maxCount: 1 },
+    { name: 'district', maxCount: 1 },
+    { name: 'postOffice', maxCount: 1 },
+    { name: 'postCode', maxCount: 1 },
+    { name: 'mobileNo', maxCount: 1 },
+    { name: 'pinCode', maxCount: 1 },
+    { name: 'IDFront', maxCount: 1 },
+    { name: 'IDBack', maxCount: 1 },
+    { name: 'currentPhoto', maxCount: 1 }
+])
 
-router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
+router.post('/personal/register', cpUpload, async(req, res) => {
+    try {
+        var client = await Client.findOne({ IDNumber: req.body.IDNumber })
+        if (client) {} else {
+            client = new Client(req.body)
+            await client.save()
+        }
+        console.log(client);
+        const personal = new Personal({ client: client._id, mobileNo: req.body.mobileNo, pinCode: req.body.pinCode })
+        await personal.save()
+        const personalVerification = new PersonalVerification({
+            personal: personal._id,
+            IDFront: req.files.IDFront[0].buffer,
+            IDBack: req.files.IDBack[0].buffer,
+            currentPhoto: req.files.currentPhoto[0].buffer,
+        })
+        await personalVerification.save()
+        res.status(201).send()
+    } catch (e) {
+        console.log(e);
+        res.status(502).send({ message: e.message })
+    }
+    /*
     try {
         const personalVerification = new PersonalVerification({
             personal: req.body.accountID,
@@ -114,8 +159,10 @@ router.post('/personal/verifyAccount', cpUpload, async(req, res) => {
         res.status(201).send(personalVerification._id)
     } catch (e) {
         res.status(502).send({ message: e.message })
-    }
+    }*/
 })
+
+
 
 router.post('/personal/login', async(req, res) => {
     try {
@@ -402,7 +449,6 @@ router.post('/merchant/registerAccount', async(req, res) => {
 var cpUpload = upload.fields([{ name: 'accountID', maxCount: 1 }, { name: 'IDFront', maxCount: 1 }, { name: 'IDBack', maxCount: 1 }, { name: 'currentPhoto', maxCount: 1 }, { name: 'tradeLicencePhoto', maxCount: 1 }])
 
 router.post('/merchant/verifyAccount', cpUpload, async(req, res) => {
-    console.log(req.files)
     try {
         const merchantVerification = new MerchantVerification({
             merchant: req.body.accountID,

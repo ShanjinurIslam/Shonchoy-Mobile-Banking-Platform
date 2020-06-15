@@ -16,7 +16,6 @@ const clientSchema = new mongoose.Schema({
     IDType: {
         type: String,
         required: true,
-        unique: true,
     },
     IDNumber: {
         type: String,
