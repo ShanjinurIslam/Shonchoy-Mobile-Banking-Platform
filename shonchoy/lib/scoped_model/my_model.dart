@@ -7,6 +7,7 @@ import 'package:shonchoy/model/personal.dart';
 class MyModel extends Model {
   Personal personal;
 
+  TextEditingController mobileNo = new TextEditingController();
   TextEditingController name = new TextEditingController();
   TextEditingController primaryName = new TextEditingController();
   TextEditingController motherName = new TextEditingController();

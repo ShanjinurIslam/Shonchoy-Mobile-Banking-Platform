@@ -37,11 +37,11 @@ var upload = multer({ dest: 'uploads/', storage: storage })
 
 // personal
 router.post('/personal/mobile', async(req, res) => {
-    const personal = await Personal.findOne({ mobileNo: req.body.mobileNo })
+    const personal = await Personal.findOne({ mobileNo: '88' + req.body.mobileNo })
     if (!personal) {
-        res.status(404).send({ message: 'This number is not linked to any account' })
+        res.status(200).send({ message: 'This number is not linked to any account' })
     } else {
-        res.status(200).send(personal)
+        res.status(400).send({ message: 'This number is linked to any account' })
     }
 })
 

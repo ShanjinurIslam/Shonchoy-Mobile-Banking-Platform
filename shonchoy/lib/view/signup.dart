@@ -14,7 +14,6 @@ class SignUp extends StatefulWidget {
 class SignUpState extends State<SignUp> {
   final GlobalKey<ScaffoldState> _scaffoldkey = new GlobalKey<ScaffoldState>();
 
-  final TextEditingController mobileNo = new TextEditingController();
   FocusNode mobileNode = new FocusNode();
 
   bool disabled = true;
@@ -27,7 +26,7 @@ class SignUpState extends State<SignUp> {
 
   void isEmpty() {
     setState(() {
-      if (mobileNo.text.trim() != "") {
+      if (ScopedModel.of<MyModel>(context).mobileNo.text.trim() != "") {
         disabled = false;
       } else {
         disabled = true;
@@ -63,7 +62,7 @@ class SignUpState extends State<SignUp> {
                       focusNode: mobileNode,
                       keyboardType: TextInputType.number,
                       onChanged: (val) => isEmpty(),
-                      controller: mobileNo,
+                      controller: ScopedModel.of<MyModel>(context).mobileNo,
                       decoration: InputDecoration(
                           labelText: 'Mobile Number',
                           labelStyle: TextStyle(color: Colors.grey)),
@@ -109,8 +108,11 @@ class SignUpState extends State<SignUp> {
                                     multiLine: false,
                                   );
 
-                                  bool flag =
-                                      regExp.hasMatch(mobileNo.text.trim());
+                                  bool flag = regExp.hasMatch(
+                                      ScopedModel.of<MyModel>(context)
+                                          .mobileNo
+                                          .text
+                                          .trim());
 
                                   if (flag) {
                                     setState(() {
@@ -120,7 +122,10 @@ class SignUpState extends State<SignUp> {
                                     // api call
                                     int statusCode =
                                         await AuthController.checkNumber(
-                                            mobileNo.text.trim());
+                                            ScopedModel.of<MyModel>(context)
+                                                .mobileNo
+                                                .text
+                                                .trim());
 
                                     if (statusCode == 200) {
                                       ScopedModel.of<MyModel>(context)
