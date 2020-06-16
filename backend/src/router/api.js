@@ -54,7 +54,11 @@ router.post('/personal/mobile/sendCode', async(req, res) => {
         brand: 'Shonchoy',
         code_length: '4'
     }, (err, result) => {
-        res.send(err ? err : result)
+        if (err) {
+            res.status(502).send(err)
+        } else {
+            res.status(200).send(result)
+        }
     });
 })
 
@@ -63,7 +67,11 @@ router.post('/personal/mobile/verifyCode', async(req, res) => {
         request_id: req.body.request_id,
         code: req.body.code,
     }, (err, result) => {
-        res.send(err ? err : result)
+        if (err) {
+            res.status(502).send(err)
+        } else {
+            res.status(200).send(result)
+        }
     });
 })
 
@@ -72,40 +80,14 @@ router.post('/personal/mobile/cancel', async(req, res) => {
         request_id: req.body.request_id,
         cmd: 'cancel'
     }, (err, result) => {
-        res.send(err ? err : result)
+        if (err) {
+            res.status(502).send(err)
+        } else {
+            res.status(200).send(result)
+        }
     });
 })
 
-// client registration
-/*
-router.post('/personal/registerClient', async(req, res) => {
-    try {
-        const client = await Client.findOne({ IDNumber: req.body.IDNumber })
-        if (client) {
-            res.status(201).send({ client_id: client._id })
-        } else {
-            const client = new Client(req.body)
-            await client.save()
-            res.status(201).send({ client_id: client._id })
-        }
-    } catch (e) {
-        res.status(502).send({ message: e.message })
-    }
-})
-
-// register personal account
-
-router.post('/personal/registerAccount', async(req, res) => {
-    try {
-        const personal = new Personal(req.body)
-        await personal.save()
-        res.status(201).send(personal._id)
-    } catch (e) {
-        res.status(502).send({ message: e.message })
-    }
-})
-*/
-// add personal account Verification
 var cpUpload = upload.fields([{ name: 'name', maxCount: 1 },
     { name: 'primaryGuardian', maxCount: 1 },
     { name: 'motherName', maxCount: 1 },
