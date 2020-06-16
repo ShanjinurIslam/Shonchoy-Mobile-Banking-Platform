@@ -128,10 +128,17 @@ class SignUpState extends State<SignUp> {
                                                 .trim());
 
                                     if (statusCode == 200) {
+                                      String mobileNo =
+                                          ScopedModel.of<MyModel>(context)
+                                              .mobileNo
+                                              .text;
+
                                       ScopedModel.of<MyModel>(context)
                                           .clearTEC();
-                                      Navigator.pushNamed(
-                                          context, '/fillupform');
+                                      ScopedModel.of<MyModel>(context)
+                                          .mobileNo
+                                          .text = mobileNo;
+                                      Navigator.pushNamed(context, '/otp');
 
                                       setState(() {
                                         isLoading = false;

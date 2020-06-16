@@ -1,11 +1,45 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:shonchoy/model/personal.dart';
 import 'package:shonchoy/statics.dart';
 
 class AuthController {
+  static Future<String> otpSend(String mobileNo) async {
+    final http.Response response = await http.post(
+      OTP_VERIFY,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'mobileNo': mobileNo}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['request_id'];
+    } else {
+      throw Exception('OTP Service Failed');
+    }
+  }
+
+  static Future<String> otpVerify(String code, String requestId) async {
+    final http.Response response = await http.post(
+      OTP_VERIFY,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'request_id': requestId, 'code': code}),
+    );
+
+    if (response.statusCode == 200) {
+      print(jsonDecode(response.body));
+      return jsonDecode(response.body).toString();
+    } else {
+      throw Exception('OTP Service Failed');
+    }
+  }
+
   static Future<Personal> logIn(String mobileNo, String pinCode) async {
     final http.Response response = await http.post(
       LOGIN_URL,
@@ -34,6 +68,61 @@ class AuthController {
     return response.statusCode;
   }
 
+  static Future<void> register(
+      {String name,
+      String primaryGuardian,
+      String motherName,
+      String idType,
+      String idNumber,
+      String dob,
+      String address,
+      String city,
+      String subdistrict,
+      String district,
+      String postOffice,
+      String postCode,
+      String mobileNo,
+      String pinCode,
+      File idFront,
+      File idBack,
+      File currentPhoto}) async {
+    FormData formData = new FormData();
+    formData.fields.add(new MapEntry('name', name));
+    formData.fields.add(new MapEntry('primaryGuardian', primaryGuardian));
+    formData.fields.add(new MapEntry('motherName', motherName));
+    formData.fields.add(new MapEntry('IDType', idType));
+    formData.fields.add(new MapEntry('IDNumber', idNumber));
+    formData.fields.add(new MapEntry('dob', dob));
+    formData.fields.add(new MapEntry('address', address));
+    formData.fields.add(new MapEntry('city', city));
+    formData.fields.add(new MapEntry('subdistrict', subdistrict));
+    formData.fields.add(new MapEntry('district', district));
+    formData.fields.add(new MapEntry('postOffice', postOffice));
+    formData.fields.add(new MapEntry('postalCode', postCode));
+    formData.fields.add(new MapEntry('mobileNo', mobileNo));
+    formData.fields.add(new MapEntry('pinCode', pinCode));
+    formData.files.add(new MapEntry<String, MultipartFile>(
+        'IDFront',
+        new MultipartFile.fromBytes(await idFront.readAsBytes(),
+            filename: 'IDFront.jpg')));
+    formData.files.add(new MapEntry<String, MultipartFile>(
+        'IDBack',
+        new MultipartFile.fromBytes(await idBack.readAsBytes(),
+            filename: 'IDBack.jpg')));
+    formData.files.add(new MapEntry<String, MultipartFile>(
+        'currentPhoto',
+        new MultipartFile.fromBytes(await currentPhoto.readAsBytes(),
+            filename: 'currentPhoto.jpg')));
+
+    Response response = await Dio().post(REGISTER, data: formData);
+
+    if (response.statusCode == 201) {
+      //
+    } else {
+      throw Exception(response.statusCode);
+    }
+  }
+  /*
   static Future<String> registerClient(
       String name,
       String primaryGuardian,
@@ -47,7 +136,7 @@ class AuthController {
       String district,
       String postOffice,
       String postCode) async {
-    final http.Response response = await http.post(registerClient,
+    final http.Response response = await http.post(REGISTER_CLIENT,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -63,11 +152,11 @@ class AuthController {
           'subdistrict': subdistrict,
           'district': district,
           'postOffice': postOffice,
-          'postCode': postCode
+          'postalCode': postCode
         }));
 
     if (response.statusCode == 201) {
-      return jsonDecode(response.body)['_id'].toString();
+      return jsonDecode(response.body)['client_id'].toString();
     } else {
       throw Exception(jsonDecode(response.body)['message'].toString());
     }
@@ -75,7 +164,7 @@ class AuthController {
 
   static Future<String> registerAccount(
       String clientId, String mobileNo, String pinCode) async {
-    final http.Response response = await http.post(registerClient,
+    final http.Response response = await http.post(REGISTER_ACCOUNT,
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -86,16 +175,18 @@ class AuthController {
         }));
 
     if (response.statusCode == 201) {
+      print(jsonDecode(response.body));
       return jsonDecode(response.body)['_id'].toString();
     } else {
       throw Exception(jsonDecode(response.body)['message'].toString());
     }
   }
 
+  // this does not work!
+
   static Future<String> verifyAccount(
       File idFront, File idBack, File currentPhoto, String accountID) async {
     var request = new http.MultipartRequest("POST", Uri.parse(VERIFY_ACCOUNT));
-    request.headers['enctype'] = 'multipart/form-data';
     request.fields['accountID'] = accountID;
     request.files.add(
       new http.MultipartFile.fromBytes(
@@ -107,11 +198,12 @@ class AuthController {
         new http.MultipartFile.fromBytes('IDBack', await idBack.readAsBytes()));
     request.files.add(new http.MultipartFile.fromBytes(
         'currentPhoto', await currentPhoto.readAsBytes()));
+
     request.send().then((response) {
       if (response.statusCode == 201)
         return jsonDecode(response.statusCode.toString());
       else
         throw Exception('Verification Failed');
     });
-  }
+  }*/
 }

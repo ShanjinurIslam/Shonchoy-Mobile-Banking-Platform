@@ -34,6 +34,8 @@ dependencies:
   path_provider: 
   path:
   intl:
+  dio:
+  pin_code_fields:
 
 dev_dependencies:
   flutter_test:

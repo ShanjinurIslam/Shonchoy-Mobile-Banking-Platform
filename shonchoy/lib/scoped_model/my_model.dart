@@ -32,6 +32,7 @@ class MyModel extends Model {
 
   void clearTEC() {
     name.clear();
+    mobileNo.clear();
     primaryName.clear();
     motherName.clear();
     idNumber.clear();

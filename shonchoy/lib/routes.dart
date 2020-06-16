@@ -3,6 +3,7 @@ import 'package:shonchoy/view/apply.dart';
 import 'package:shonchoy/view/form_fillup.dart';
 import 'package:shonchoy/view/home.dart';
 import 'package:shonchoy/view/login.dart';
+import 'package:shonchoy/view/otp.dart';
 import 'package:shonchoy/view/photo_instruction.dart';
 import 'package:shonchoy/view/selfie_instruction.dart';
 import 'package:shonchoy/view/signup.dart';
@@ -20,5 +21,6 @@ final routes = {
   '/fillupform': (BuildContext context) => FormFillup(),
   '/photoinstruction': (BuildContext context) => PhotoInstruction(),
   '/selfieinstruction': (BuildContext context) => SelfieInstruction(),
-  '/apply': (BuildContext context) => ApplyPage()
+  '/apply': (BuildContext context) => ApplyPage(),
+  '/otp': (BuildContext context) => OTPVerification()
 };

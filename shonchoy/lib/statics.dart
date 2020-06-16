@@ -1,6 +1,6 @@
-final BASE_URL = "http://192.168.0.104:8080/api/personal";
+final BASE_URL = "http://192.168.0.101:8080/api/personal";
 final LOGIN_URL = BASE_URL + '/login';
 final CHECK_NUMBER_URL = BASE_URL + '/mobile';
-final REGISTER_CLIENT = BASE_URL + '/registerClient';
-final REGISTER_ACCOUNT = BASE_URL + '/registerAccount';
-final VERIFY_ACCOUNT = BASE_URL + '/verifyAccount';
+final REGISTER = BASE_URL + '/register';
+final OTP_VERIFY = BASE_URL + '/mobile/sendCode';
+
