@@ -32,6 +32,7 @@ class ApplyPageState extends State<ApplyPage> {
       String postOffice = ScopedModel.of<MyModel>(context).postOffice.text;
       String postCode = ScopedModel.of<MyModel>(context).postCode.text;
       String mobileNo = ScopedModel.of<MyModel>(context).mobileNo.text;
+      String pinCode = ScopedModel.of<MyModel>(context).pinCode.text;
 
       // have to switch to 1 single request
       await AuthController.register(
@@ -48,7 +49,7 @@ class ApplyPageState extends State<ApplyPage> {
         postOffice: postOffice,
         postCode: postCode,
         mobileNo: mobileNo,
-        pinCode: '1234',
+        pinCode: pinCode,
         idFront: ScopedModel.of<MyModel>(context).idFront,
         idBack: ScopedModel.of<MyModel>(context).idBack,
         currentPhoto: ScopedModel.of<MyModel>(context).currentPhoto,

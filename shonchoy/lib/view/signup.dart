@@ -138,7 +138,9 @@ class SignUpState extends State<SignUp> {
                                       ScopedModel.of<MyModel>(context)
                                           .mobileNo
                                           .text = mobileNo;
-                                      Navigator.pushNamed(context, '/otp');
+                                      //Navigator.pushNamed(context, '/otp');
+                                      Navigator.pushNamed(
+                                          context, '/fillupform');
 
                                       setState(() {
                                         isLoading = false;

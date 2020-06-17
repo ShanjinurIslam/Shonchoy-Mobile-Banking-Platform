@@ -19,6 +19,8 @@ class MyModel extends Model {
   TextEditingController district = new TextEditingController();
   TextEditingController postOffice = new TextEditingController();
   TextEditingController postCode = new TextEditingController();
+  TextEditingController pinCode = new TextEditingController();
+  TextEditingController confirmPinCode = new TextEditingController();
 
   File idFront;
   File idBack;
@@ -43,6 +45,9 @@ class MyModel extends Model {
     district.clear();
     postOffice.clear();
     postCode.clear();
+    pinCode.clear();
+    confirmPinCode.clear();
+    idType = "Select ID Type";
   }
 
   bool isEmpty() {

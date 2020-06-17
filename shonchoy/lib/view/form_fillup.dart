@@ -212,7 +212,7 @@ class FormFillupState extends State<FormFillup> {
                     : () {
                         try {
                           ScopedModel.of<MyModel>(context).checkValidity();
-                          Navigator.pushNamed(context, '/photoinstruction');
+                          Navigator.pushNamed(context, '/pinCode');
                         } catch (e) {
                           Widget okButton = FlatButton(
                             child: Text("OK"),
