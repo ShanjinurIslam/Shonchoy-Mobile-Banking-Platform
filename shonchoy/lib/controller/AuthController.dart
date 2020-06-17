@@ -8,35 +8,47 @@ import 'package:shonchoy/statics.dart';
 
 class AuthController {
   static Future<String> otpSend(String mobileNo) async {
+    print('I am here');
     final http.Response response = await http.post(
-      OTP_VERIFY,
+      OTP_SEND,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, String>{'mobileNo': mobileNo}),
+      body: jsonEncode(<String, String>{'mobileNo': '88' + mobileNo}),
     );
+    var json = jsonDecode(response.body);
+
+    print(json);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['request_id'];
+      if (json['status'] != "0") {
+        throw Exception(json['error_text']);
+      } else
+        return json['request_id'];
     } else {
       throw Exception('OTP Service Failed');
     }
   }
 
-  static Future<String> otpVerify(String code, String requestId) async {
-    final http.Response response = await http.post(
-      OTP_VERIFY,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{'request_id': requestId, 'code': code}),
-    );
+  static Future<String> otpVerify(String requestID, String code) async {
+    try {
+      Response response = await Dio().post(OTP_VERIFY,
+          options: Options(headers: {
+            Headers.contentTypeHeader:
+                'application/json; charset=UTF-8', // set content-length
+          }),
+          data: {"request_id": requestID, "code": code});
 
-    if (response.statusCode == 200) {
-      print(jsonDecode(response.body));
-      return jsonDecode(response.body).toString();
-    } else {
-      throw Exception('OTP Service Failed');
+      print(response.data);
+
+      if (response.statusCode == 200) {
+        if (response.data['status'] != "0") {
+          throw new Exception(response.data['error_text']);
+        } else
+          return 'Verification Success';
+      }
+    } catch (e) {
+      throw new Exception(e.message);
     }
   }
 
