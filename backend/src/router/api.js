@@ -49,6 +49,8 @@ router.post('/personal/mobile', async(req, res) => {
 // otp verification - nexmo api
 
 router.post('/personal/mobile/sendCode', async(req, res) => {
+    console.log(req.body.mobileNo)
+
     await nexmo.verify.request({
         number: req.body.mobileNo,
         brand: 'Shonchoy',
@@ -63,6 +65,7 @@ router.post('/personal/mobile/sendCode', async(req, res) => {
 })
 
 router.post('/personal/mobile/verifyCode', async(req, res) => {
+    console.log(req.body);
     await nexmo.verify.check({
         request_id: req.body.request_id,
         code: req.body.code,

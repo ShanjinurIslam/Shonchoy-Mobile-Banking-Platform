@@ -175,6 +175,20 @@ router.post('/Personal/:personalID/verify', middleware, async(req, res) => {
     }
 })
 
+router.post('/Personal/:personalID/discard', middleware, async(req, res) => {
+    try {
+        await PersonalVerification.deleteOne({ personal: req.params.personalID })
+        const personal = await Personal.findById(req.params.personalID)
+        const client = await Client.deleteOne({ _id: personal.client })
+        await Personal.deleteOne({ _id: personal._id })
+
+        return res.redirect('/Personal/verify')
+    } catch (e) {
+        console.log(e.message)
+        return res.render('personal_verify', { error: e.message, title: 'Personal Verify Details', active: { personal: true } })
+    }
+})
+
 router.get('/Personal/revoke', middleware, async(req, res) => {
     const personals = await Personal.find({ locked: false })
 
