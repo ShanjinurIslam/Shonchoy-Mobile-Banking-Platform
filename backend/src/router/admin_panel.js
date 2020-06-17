@@ -181,7 +181,6 @@ router.post('/Personal/:personalID/discard', middleware, async(req, res) => {
         const personal = await Personal.findById(req.params.personalID)
         const client = await Client.deleteOne({ _id: personal.client })
         await Personal.deleteOne({ _id: personal._id })
-
         return res.redirect('/Personal/verify')
     } catch (e) {
         console.log(e.message)
