@@ -58,6 +58,11 @@ flutter:
      - images/idfront.jpg
      - images/idback.jpg
      - images/selfie.gif
+     - images/cashin.png
+     - images/cashout.png
+     - images/payment.png
+     - images/sendmoney.png
+     - images/profile.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

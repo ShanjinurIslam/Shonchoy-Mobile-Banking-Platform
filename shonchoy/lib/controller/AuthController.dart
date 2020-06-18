@@ -8,7 +8,6 @@ import 'package:shonchoy/statics.dart';
 
 class AuthController {
   static Future<String> otpSend(String mobileNo) async {
-    print('I am here');
     final http.Response response = await http.post(
       OTP_SEND,
       headers: <String, String>{
@@ -53,14 +52,16 @@ class AuthController {
   }
 
   static Future<Personal> logIn(String mobileNo, String pinCode) async {
-    final http.Response response = await http.post(
-      LOGIN_URL,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(
-          <String, String>{'mobileNo': mobileNo, 'pinCode': pinCode}),
-    );
+    final http.Response response = await http
+        .post(
+          LOGIN_URL,
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(
+              <String, String>{'mobileNo': mobileNo, 'pinCode': pinCode}),
+        )
+        .timeout(new Duration(seconds: 1));
     if (response.statusCode == 200) {
       Personal personal = Personal.fromJson(json.decode(response.body));
       return personal;
