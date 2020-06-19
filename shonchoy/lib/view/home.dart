@@ -36,7 +36,7 @@ class Home extends StatelessWidget {
                 GestureDetector(
                   child: Image.asset(
                     'images/profile.png',
-                    scale: 15,
+                    scale: 20,
                   ),
                   onTap: () {
                     Navigator.pushNamed(context, '/profile');
@@ -133,7 +133,9 @@ class Home extends StatelessWidget {
                     Column(
                       children: <Widget>[
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/sendmoney');
+                          },
                           iconSize: 50,
                           icon: Image.asset('images/sendmoney.png'),
                         ),

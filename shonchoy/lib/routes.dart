@@ -8,6 +8,7 @@ import 'package:shonchoy/view/photo_instruction.dart';
 import 'package:shonchoy/view/pinCode.dart';
 import 'package:shonchoy/view/profile.dart';
 import 'package:shonchoy/view/selfie_instruction.dart';
+import 'package:shonchoy/view/sendmoney.dart';
 import 'package:shonchoy/view/signup.dart';
 import 'package:shonchoy/view/splash.dart';
 import 'package:shonchoy/view/take_photo.dart';
@@ -27,4 +28,5 @@ final routes = {
   '/apply': (BuildContext context) => ApplyPage(),
   '/otp': (BuildContext context) => OTPVerification(),
   '/profile': (BuildContext context) => Profile(),
+  '/sendmoney': (BuildContext context) => SendMoney(),
 };
