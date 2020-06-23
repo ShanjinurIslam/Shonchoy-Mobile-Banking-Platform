@@ -77,6 +77,7 @@ class LogInScreenState extends State<LogInScreen> {
                     height: 10,
                   ),
                   TextField(
+                    obscureText: true,
                     focusNode: pinNode,
                     keyboardType: TextInputType.number,
                     onChanged: (val) => isEmpty(),

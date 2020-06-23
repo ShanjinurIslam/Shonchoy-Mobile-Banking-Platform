@@ -507,7 +507,6 @@ router.post('/Agent/:agentID/updateAgent', middleware, async(req, res) => {
         res.redirect('/Agent/' + req.params.agentID)
     }
 })
-
 router.get('/PersonalVerification/:id/IDFront', middleware, async(req, res) => {
     try {
         const verification = await PersonalVerification.findById(req.params.id)
