@@ -6,6 +6,10 @@ import 'dart:io' show Platform;
 
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/services.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shonchoy/controller/APIController.dart';
+import 'package:shonchoy/controller/AuthController.dart';
+import 'package:shonchoy/scoped_model/my_model.dart';
 
 class SendMoney extends StatefulWidget {
   @override
@@ -15,9 +19,12 @@ class SendMoney extends StatefulWidget {
 }
 
 class SendMoneyState extends State<SendMoney> {
+  TextEditingController controller = new TextEditingController();
   String mobileNumber;
   bool numberScanned;
   bool contactsRead = false;
+  bool apiCalled = false;
+  int statusCode;
   static final _possibleFormats = BarcodeFormat.qr;
   List<Contact> contacts = new List<Contact>();
   List<Contact> allContacts = new List<Contact>();
@@ -43,8 +50,19 @@ class SendMoneyState extends State<SendMoney> {
     allContacts = contacts;
   }
 
+  void callAPI() async {
+    statusCode = await AuthController.checkNumber(mobileNumber);
+    setState(() {
+      apiCalled = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (numberScanned & !apiCalled) {
+      callAPI();
+    }
+
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
@@ -125,6 +143,7 @@ class SendMoneyState extends State<SendMoney> {
                     border: Border.all(color: Colors.green, width: 2),
                     borderRadius: BorderRadius.circular(10)),
                 child: TextField(
+                  controller: controller,
                   onChanged: (String v) {
                     bool isMatch = RegExp(
                       r"^01[3-9][0-9]{8}",
@@ -140,10 +159,18 @@ class SendMoneyState extends State<SendMoney> {
                     } else {
                       setState(() {
                         numberScanned = false;
+                        apiCalled = false;
                         contacts = allContacts
-                            .where((element) => element.givenName
-                                .toUpperCase()
-                                .contains(v.trim().toUpperCase()))
+                            .where((element) =>
+                                element.givenName
+                                    .toUpperCase()
+                                    .contains(v.trim().toUpperCase()) |
+                                element.phones
+                                    .toList()
+                                    .elementAt(0)
+                                    .value
+                                    .replaceAll(new RegExp(r"\+88|\ |\-"), '')
+                                    .contains(v))
                             .toList();
                       });
                     }
@@ -176,7 +203,63 @@ class SendMoneyState extends State<SendMoney> {
                 ? Padding(
                     padding: EdgeInsets.all(24),
                     child: Container(
-                      child: Text(mobileNumber.toString()),
+                      child: apiCalled
+                          ? statusCode == 200
+                              ? Center(
+                                  child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      'This number is not linked to any account',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    RaisedButton(
+                                      color: Colors.green,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      onPressed: () {
+                                        controller.clear();
+                                        contacts = allContacts;
+                                        setState(() {
+                                          numberScanned = false;
+                                          apiCalled = false;
+                                        });
+                                      },
+                                      child: Text('Cancel',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                    )
+                                  ],
+                                ))
+                              : Center(
+                                  child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      'Send Money to ' + mobileNumber,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    RaisedButton(
+                                      elevation: 0,
+                                      color: Colors.green,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      onPressed: () {},
+                                      child: Text('Proceed',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                    )
+                                  ],
+                                ))
+                          : Container(),
                     ),
                   )
                 : !contactsRead
@@ -188,13 +271,16 @@ class SendMoneyState extends State<SendMoney> {
                                 padding: EdgeInsets.only(bottom: 1),
                                 color: Colors.white,
                                 onPressed: () {
-                                  print(contacts[index]
-                                      .phones
-                                      .toList()
-                                      .elementAt(0)
-                                      .value
-                                      .replaceAll(
-                                          new RegExp(r"\+88|\ |\-"), ''));
+                                  setState(() {
+                                    mobileNumber = contacts[index]
+                                        .phones
+                                        .toList()
+                                        .elementAt(0)
+                                        .value
+                                        .replaceAll(
+                                            new RegExp(r"\+88|\ |\-"), '');
+                                    numberScanned = true;
+                                  });
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(

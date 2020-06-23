@@ -153,7 +153,7 @@ router.post('/personal/login', async(req, res) => {
     try {
         const personal = await Personal.authenticate(req.body.mobileNo, req.body.pinCode)
         if (!personal.verified) {
-            res.status(200).send({ message: "Account Verification Still in Progress" })
+            res.status(400).send({ message: "Account Verification Still in Progress" })
         } else {
             const token = await personal.generateAuthToken()
             const client = await Client.findById(personal.client);

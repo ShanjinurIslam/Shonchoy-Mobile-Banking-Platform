@@ -10,9 +10,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          //bottom: false,
-          child: Column(
-        children: <Widget>[
+        //bottom: false,
+        child: Column(children: <Widget>[
           Padding(
             padding: EdgeInsets.all(24),
             child: Row(
@@ -163,87 +162,75 @@ class Home extends StatelessWidget {
               ],
             ),
           ),
+          Padding(
+            padding: EdgeInsets.all(24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  'Transactions',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                GestureDetector(
+                  child: Icon(Icons.arrow_forward),
+                  onTap: () {},
+                )
+              ],
+            ),
+          ),
           Expanded(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Transactions',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        GestureDetector(
-                          child: Icon(Icons.arrow_forward),
-                          onTap: () {},
-                        )
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                      child: itemCount < 1
-                          ? Padding(
-                              padding: EdgeInsets.all(24),
-                              child: Text('No transactions'))
-                          : ListView.builder(
-                              itemBuilder: (BuildContext context, int index) {
-                                return Container(
-                                    margin: EdgeInsets.all(1),
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 100,
-                                    child: Padding(
-                                      padding: EdgeInsets.all(22),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.computer,
-                                            size: 30,
-                                          ),
-                                          Spacer(
-                                            flex: 1,
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Company Name',
-                                                style: TextStyle(fontSize: 18),
-                                              ),
-                                              Text('Service'),
-                                            ],
-                                          ),
-                                          Spacer(
-                                            flex: 5,
-                                          ),
-                                          Text(
-                                            '-৳45',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.red),
-                                          ),
-                                        ],
+              child: itemCount < 1
+                  ? Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('No transactions'))
+                  : ListView.builder(
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                            margin: EdgeInsets.all(1),
+                            width: MediaQuery.of(context).size.width,
+                            height: 100,
+                            child: Padding(
+                              padding: EdgeInsets.all(22),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.computer,
+                                    size: 30,
+                                  ),
+                                  Spacer(
+                                    flex: 1,
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        'Company Name',
+                                        style: TextStyle(fontSize: 18),
                                       ),
-                                    ),
-                                    color: Colors.white);
-                              },
-                              itemCount: 5,
-                            ))
-                ]),
-          )
-        ],
-      )),
+                                      Text('Service'),
+                                    ],
+                                  ),
+                                  Spacer(
+                                    flex: 5,
+                                  ),
+                                  Text(
+                                    '-৳45',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.red),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            color: Colors.white);
+                      },
+                      itemCount: 5,
+                    ))
+        ]),
+      ),
     );
   }
 }

@@ -66,7 +66,7 @@ class AuthController {
       Personal personal = Personal.fromJson(json.decode(response.body));
       return personal;
     } else {
-      throw new Exception(response.body.toString());
+      throw new Exception(jsonDecode(response.body)['message'].toString());
     }
   }
 
@@ -78,6 +78,9 @@ class AuthController {
       },
       body: jsonEncode(<String, String>{'mobileNo': mobileNo}),
     );
+
+    print(response.body);
+
     return response.statusCode;
   }
 
@@ -135,88 +138,4 @@ class AuthController {
       throw Exception(response.statusCode);
     }
   }
-  /*
-  static Future<String> registerClient(
-      String name,
-      String primaryGuardian,
-      String motherName,
-      String idType,
-      String idNumber,
-      String dob,
-      String address,
-      String city,
-      String subdistrict,
-      String district,
-      String postOffice,
-      String postCode) async {
-    final http.Response response = await http.post(REGISTER_CLIENT,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'name': name,
-          'primaryGuardian': primaryGuardian,
-          'motherName': motherName,
-          'IDType': idType,
-          'IDNumber': idNumber,
-          'dob': dob,
-          'address': address,
-          'city': city,
-          'subdistrict': subdistrict,
-          'district': district,
-          'postOffice': postOffice,
-          'postalCode': postCode
-        }));
-
-    if (response.statusCode == 201) {
-      return jsonDecode(response.body)['client_id'].toString();
-    } else {
-      throw Exception(jsonDecode(response.body)['message'].toString());
-    }
-  }
-
-  static Future<String> registerAccount(
-      String clientId, String mobileNo, String pinCode) async {
-    final http.Response response = await http.post(REGISTER_ACCOUNT,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'client': clientId,
-          'mobileNo': mobileNo,
-          'pinCode': '12345' // a demo pincode?
-        }));
-
-    if (response.statusCode == 201) {
-      print(jsonDecode(response.body));
-      return jsonDecode(response.body)['_id'].toString();
-    } else {
-      throw Exception(jsonDecode(response.body)['message'].toString());
-    }
-  }
-
-  // this does not work!
-
-  static Future<String> verifyAccount(
-      File idFront, File idBack, File currentPhoto, String accountID) async {
-    var request = new http.MultipartRequest("POST", Uri.parse(VERIFY_ACCOUNT));
-    request.fields['accountID'] = accountID;
-    request.files.add(
-      new http.MultipartFile.fromBytes(
-        'IDFront',
-        await idFront.readAsBytes(),
-      ),
-    );
-    request.files.add(
-        new http.MultipartFile.fromBytes('IDBack', await idBack.readAsBytes()));
-    request.files.add(new http.MultipartFile.fromBytes(
-        'currentPhoto', await currentPhoto.readAsBytes()));
-
-    request.send().then((response) {
-      if (response.statusCode == 201)
-        return jsonDecode(response.statusCode.toString());
-      else
-        throw Exception('Verification Failed');
-    });
-  }*/
 }

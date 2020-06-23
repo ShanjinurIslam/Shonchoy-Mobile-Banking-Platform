@@ -12,8 +12,6 @@ const publicPath = path.join(__dirname, '../public')
 const viewsPath = path.join(__dirname, '../templates/views')
 const partialsPath = path.join(__dirname, '../templates/partials')
 
-
-
 // singleton db call
 require('./db/mongoose')
 

@@ -137,7 +137,7 @@ class FormFillupState extends State<FormFillup> {
                     onChanged: (val) => isEmpty(context),
                     controller: ScopedModel.of<MyModel>(context).dob,
                     decoration: InputDecoration(
-                        labelText: 'Date of birth (DD-MM-YYYY)',
+                        labelText: 'Date of birth (MM-DD-YYYY)',
                         labelStyle: TextStyle(color: Colors.grey)),
                   ),
                   TextField(
