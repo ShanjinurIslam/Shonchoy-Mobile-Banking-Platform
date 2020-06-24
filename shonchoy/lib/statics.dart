@@ -4,4 +4,4 @@ final CHECK_NUMBER_URL = BASE_URL + '/mobile';
 final REGISTER = BASE_URL + '/register';
 final OTP_SEND = BASE_URL + '/mobile/sendCode';
 final OTP_VERIFY = BASE_URL + '/mobile/verifyCode';
-
+final SEND_MONEY = BASE_URL + '/sendMoney';

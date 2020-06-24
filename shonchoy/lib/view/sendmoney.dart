@@ -252,7 +252,11 @@ class SendMoneyState extends State<SendMoney> {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(10)),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pushNamed(
+                                            context, '/sendMoneyForm',
+                                            arguments: mobileNumber);
+                                      },
                                       child: Text('Proceed',
                                           style:
                                               TextStyle(color: Colors.white)),
