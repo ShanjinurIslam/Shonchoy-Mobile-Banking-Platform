@@ -17,6 +17,7 @@ class SendMoneyFormState extends State<SendMoneyForm> {
   final TextEditingController receiverTextField = new TextEditingController();
   final TextEditingController amount = new TextEditingController();
   final TextEditingController pinCode = new TextEditingController();
+  double balance = 0;
 
   FocusNode amountNode = new FocusNode();
   FocusNode pinCodeNode = new FocusNode();
@@ -31,6 +32,20 @@ class SendMoneyFormState extends State<SendMoneyForm> {
       } else {
         disabled = true;
       }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBalance();
+  }
+
+  void getBalance() async {
+    balance = await APIController.getBalance(
+        ScopedModel.of<MyModel>(context).personal.authToken);
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -80,7 +95,7 @@ class SendMoneyFormState extends State<SendMoneyForm> {
                             children: <Widget>[
                               Text('Available Balance: '),
                               Text(
-                                '৳' + '1000.00',
+                                '৳' + balance.toString(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],

@@ -1,10 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shonchoy/controller/APIController.dart';
+import 'package:shonchoy/model/transaction.dart';
 import 'package:shonchoy/scoped_model/my_model.dart';
 
-class Home extends StatelessWidget {
-  int itemCount = 5;
+class Home extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return new HomeState();
+  }
+}
+
+class HomeState extends State<Home> {
+  bool isLoading = true;
+  double balance = 0;
+  List<Transaction> transactions = new List<Transaction>();
+
+  @override
+  void initState() {
+    super.initState();
+    getTransactions();
+  }
+
+  void getTransactions() async {
+    transactions = await APIController.getTransactions(
+        ScopedModel.of<MyModel>(context).personal.authToken);
+    balance = await APIController.getBalance(
+        ScopedModel.of<MyModel>(context).personal.authToken);
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,25 +92,24 @@ class Home extends StatelessWidget {
                     'Balance',
                     style: TextStyle(color: Colors.white, fontSize: 10),
                   ),
-                  Text(
-                    '৳123.45' /*+
-                          ScopedModel.of<MyModel>(context)
-                              .personal
-                              .balance
-                              .toString()*/
-                    ,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700),
-                  ),
+                  isLoading
+                      ? Container(
+                          height: 24,
+                        )
+                      : Text(
+                          '৳' + balance.toString(),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700),
+                        ),
                   Spacer(),
                   Text(
                     'Account Holder',
                     style: TextStyle(color: Colors.white, fontSize: 10),
                   ),
                   Text(
-                    /*ScopedModel.of<MyModel>(context).personal.client.name*/ 'Placeholder',
+                    ScopedModel.of<MyModel>(context).personal.client.name,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -111,7 +137,7 @@ class Home extends StatelessWidget {
                           icon: Image.asset('images/cashin.png'),
                         ),
                         Text(
-                          'Cash In',
+                          'Request',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         )
                       ],
@@ -178,57 +204,70 @@ class Home extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(
-              child: itemCount < 1
-                  ? Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text('No transactions'))
-                  : ListView.builder(
-                      itemBuilder: (BuildContext context, int index) {
-                        return Container(
-                            margin: EdgeInsets.all(1),
-                            width: MediaQuery.of(context).size.width,
-                            height: 100,
-                            child: Padding(
-                              padding: EdgeInsets.all(22),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.computer,
-                                    size: 30,
-                                  ),
-                                  Spacer(
-                                    flex: 1,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+          isLoading
+              ? Center(
+                  child: CupertinoActivityIndicator(),
+                )
+              : Expanded(
+                  child: transactions.length < 1
+                      ? Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text('No transactions'))
+                      : ListView.builder(
+                          itemBuilder: (BuildContext context, int index) {
+                            return Container(
+                                margin: EdgeInsets.all(1),
+                                width: MediaQuery.of(context).size.width,
+                                height: 100,
+                                child: Padding(
+                                  padding: EdgeInsets.all(22),
+                                  child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
-                                      Text(
-                                        'Company Name',
-                                        style: TextStyle(fontSize: 18),
+                                      Tab(
+                                          icon: new Image.asset(
+                                              "images/sendmoney.png")),
+                                      Spacer(
+                                        flex: 2,
                                       ),
-                                      Text('Service'),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            transactions[index].sender +
+                                                ' -> ' +
+                                                transactions[index].receiver,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          Text(transactions[index].type),
+                                        ],
+                                      ),
+                                      Spacer(
+                                        flex: 5,
+                                      ),
+                                      Text(
+                                        transactions[index].pos == "sender"
+                                            ? '-৳' + transactions[index].amount
+                                            : '+৳' + transactions[index].amount,
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            color: transactions[index].pos ==
+                                                    "sender"
+                                                ? Colors.red
+                                                : Colors.green),
+                                      ),
                                     ],
                                   ),
-                                  Spacer(
-                                    flex: 5,
-                                  ),
-                                  Text(
-                                    '-৳45',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            color: Colors.white);
-                      },
-                      itemCount: 5,
-                    ))
+                                ),
+                                color: Colors.white);
+                          },
+                          itemCount: transactions.length,
+                        ))
         ]),
       ),
     );

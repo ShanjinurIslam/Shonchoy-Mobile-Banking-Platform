@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:shonchoy/model/sendMoney.dart';
+import 'package:shonchoy/model/transaction.dart';
 
 import '../statics.dart';
 
@@ -29,6 +31,45 @@ class APIController {
       return SendMoneyModel.fromJson(json);
     } else {
       throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
+
+  static Future<List<Transaction>> getTransactions(String authToken) async {
+    final http.Response response = await http.get(
+      GET_TRANSACTIONS,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ' + authToken,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> jsons = jsonDecode(response.body);
+      List<Transaction> transactions = new List<Transaction>();
+      for (int i = 0; i < jsons.length; i++) {
+        transactions.add(Transaction.fromJson(jsons[i]));
+      }
+
+      return transactions;
+    } else {
+      throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
+
+  static Future<double> getBalance(String authToken) async {
+    final Response response = await Dio().get(GET_BALANCE,
+        options: Options(
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer ' + authToken,
+          },
+        ));
+
+    if (response.statusCode == 200) {
+      double balance = response.data['balance'];
+      return balance;
+    } else {
+      throw Exception(response.data['message']);
     }
   }
 }
