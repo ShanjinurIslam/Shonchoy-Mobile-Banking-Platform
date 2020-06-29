@@ -132,19 +132,6 @@ router.post('/personal/register', cpUpload, async(req, res) => {
         console.log(e);
         res.status(502).send({ message: e.message })
     }
-    /*
-    try {
-        const personalVerification = new PersonalVerification({
-            personal: req.body.accountID,
-            IDFront: req.files.IDFront[0].buffer,
-            IDBack: req.files.IDBack[0].buffer,
-            currentPhoto: req.files.currentPhoto[0].buffer,
-        })
-        await personalVerification.save()
-        res.status(201).send(personalVerification._id)
-    } catch (e) {
-        res.status(502).send({ message: e.message })
-    }*/
 })
 
 
@@ -199,6 +186,7 @@ router.get('/personal/me', personalAuth, (req, res) => {
 
 
 router.post('/personal/sendMoney', personalAuth, async(req, res) => {
+    console.log(req.body)
     const pinCode = req.body.pinCode
     const amount = req.body.amount
     const transactionType = req.body.transactionType
@@ -219,14 +207,31 @@ router.post('/personal/sendMoney', personalAuth, async(req, res) => {
 
             const sendMoney = new Sendmoney({ transaction: transaction._id, sender: senderPersonal._id, receiver: receiverPersonal._id })
             await sendMoney.save()
-            return res.status(200).send(sendMoney)
+            sendMoney.transaction = transaction
+            sendMoney.sender = senderPersonal.mobileNo
+            sendMoney.receiver = receiverPersonal.mobileNo
+
+            var object = new Object()
+            object._id = sendMoney._id
+            object.transactionId = transaction._id
+            object.transactionType = transaction.transactionType
+            object.amount = transaction.amount
+            object.sender = senderPersonal.mobileNo
+            object.receiver = receiverPersonal.mobileNo
+            object.createdAt = sendMoney.createdAt
+            console.log(object)
+            return res.status(200).send(object)
         } else {
             return res.status(400).send({ message: "Insufficient Balance" })
         }
 
     } else {
-        return res.status(400).send()
+        return res.status(400).send({ message: "Incorrect Pincode" })
     }
+})
+
+router.get('/personal/balance', personalAuth, async(req, res) => {
+    return res.status(200).send({ balance: req.personal.balance });
 })
 
 router.post('/personal/payment', personalAuth, async(req, res) => {
@@ -259,6 +264,50 @@ router.post('/personal/payment', personalAuth, async(req, res) => {
         return res.status(400).send()
     }
 })
+
+router.get('/personal/transactions', personalAuth, async(req, res) => {
+
+    try {
+        const allSm = await Sendmoney.find({ $or: [{ sender: req.personal._id }, { receiver: req.personal._id }] }).sort('-createdAt')
+
+        for (var i = 0; i < allSm.length; i++) {
+
+            var object = new Object()
+
+            const transaction = await Transaction.findById(allSm[i].transaction)
+            object._id = transaction._id
+            object.type = transaction.transactionType
+            object.amount = transaction.amount
+
+
+            const sender = await Personal.findById(allSm[i].sender)
+            object.sender = sender.mobileNo
+
+            const receiver = await Personal.findById(allSm[i].receiver)
+            object.receiver = receiver.mobileNo
+
+            if (object.sender == req.personal.mobileNo) {
+                object.as = "sender"
+            } else {
+                object.as = "receiver"
+            }
+
+            object.createdAt = allSm[i].createdAt
+
+            allSm[i] = object
+        }
+
+        // cash in cash outs
+
+        // payments
+
+        res.status(200).send(allSm)
+    } catch (e) {
+        res.status(400).send(e.message)
+    }
+
+})
+
 
 // agent registration
 
