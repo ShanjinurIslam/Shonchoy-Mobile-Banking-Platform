@@ -134,7 +134,7 @@ class HomeState extends State<Home> {
                         IconButton(
                           onPressed: () {},
                           iconSize: 50,
-                          icon: Image.asset('images/cashin.png'),
+                          icon: Image.asset('images/cashIn.png'),
                         ),
                         Text(
                           'Request',
@@ -145,9 +145,11 @@ class HomeState extends State<Home> {
                     Column(
                       children: <Widget>[
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/cashout');
+                          },
                           iconSize: 50,
-                          icon: Image.asset('images/cashout.png'),
+                          icon: Image.asset('images/cashOut.png'),
                         ),
                         Text(
                           'Cash Out',
@@ -162,7 +164,7 @@ class HomeState extends State<Home> {
                             Navigator.pushNamed(context, '/sendmoney');
                           },
                           iconSize: 50,
-                          icon: Image.asset('images/sendmoney.png'),
+                          icon: Image.asset('images/sendMoney.png'),
                         ),
                         Text(
                           'Send Money',
@@ -227,8 +229,9 @@ class HomeState extends State<Home> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Tab(
-                                          icon: new Image.asset(
-                                              "images/sendmoney.png")),
+                                          icon: new Image.asset("images/" +
+                                              transactions[index].type +
+                                              ".png")),
                                       Spacer(
                                         flex: 2,
                                       ),

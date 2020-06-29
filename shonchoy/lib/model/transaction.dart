@@ -5,7 +5,7 @@ class Transaction {
   final String sender;
   final String receiver;
   final String pos;
-  final String createdAt;
+  final DateTime createdAt;
 
   Transaction(
       {this.id,
@@ -17,7 +17,6 @@ class Transaction {
       this.createdAt});
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
-
     return Transaction(
         id: json['_id'],
         type: json['type'],
@@ -25,6 +24,6 @@ class Transaction {
         sender: json['sender'],
         receiver: json['receiver'],
         pos: json['as'],
-        createdAt: json['createdAt']);
+        createdAt: DateTime.parse(json['createdAt']));
   }
 }

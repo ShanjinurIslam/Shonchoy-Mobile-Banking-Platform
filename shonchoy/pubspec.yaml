@@ -61,10 +61,10 @@ flutter:
      - images/idfront.jpg
      - images/idback.jpg
      - images/selfie.gif
-     - images/cashin.png
-     - images/cashout.png
+     - images/cashIn.png
+     - images/cashOut.png
      - images/payment.png
-     - images/sendmoney.png
+     - images/sendMoney.png
      - images/profile.png
      - images/hamburger.png
      - images/qrcode.png

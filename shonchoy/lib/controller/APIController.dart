@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:shonchoy/model/cashOut.dart';
 import 'package:shonchoy/model/sendMoney.dart';
 import 'package:shonchoy/model/transaction.dart';
 
@@ -34,6 +35,33 @@ class APIController {
     }
   }
 
+  static Future<CashOutModel> cashOut(
+      String receiver, String authToken, String pinCode, double amount) async {
+    String transactionType = "cashOut";
+
+    final http.Response response = await http.post(
+      CASH_OUT,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ' + authToken,
+      },
+      body: jsonEncode(<String, String>{
+        'transactionType': transactionType,
+        'receiver': receiver,
+        'pinCode': pinCode,
+        'amount': amount.toString(),
+        'charge': (amount * .01).toString(),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> json = jsonDecode(response.body);
+      return CashOutModel.fromJson(json);
+    } else {
+      throw Exception(jsonDecode(response.body)['message']);
+    }
+  }
+
   static Future<List<Transaction>> getTransactions(String authToken) async {
     final http.Response response = await http.get(
       GET_TRANSACTIONS,
@@ -49,8 +77,11 @@ class APIController {
       for (int i = 0; i < jsons.length; i++) {
         transactions.add(Transaction.fromJson(jsons[i]));
       }
+      transactions.sort((a, b) {
+        return a.createdAt.compareTo(b.createdAt);
+      });
 
-      return transactions;
+      return transactions.reversed.toList();
     } else {
       throw Exception(jsonDecode(response.body)['message']);
     }

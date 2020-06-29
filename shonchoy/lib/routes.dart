@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shonchoy/view/apply.dart';
+import 'package:shonchoy/view/cashOutInvoice.dart';
+import 'package:shonchoy/view/cashout.dart';
 import 'package:shonchoy/view/form_fillup.dart';
 import 'package:shonchoy/view/home.dart';
 import 'package:shonchoy/view/login.dart';
@@ -33,5 +35,6 @@ final routes = {
   '/sendmoney': (BuildContext context) => SendMoney(),
   '/sendMoneyForm': (BuildContext context) => SendMoneyForm(),
   '/sendMoneyInvoice': (BuildContext context) => SendMoneyInvoice(),
-  
+  '/cashout': (BuildContext context) => CashOut(),
+  '/cashOutInvoice': (BuildContext context) => CashOutInvoice()
 };

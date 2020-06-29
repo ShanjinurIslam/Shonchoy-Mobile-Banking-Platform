@@ -1,4 +1,4 @@
-final BASE_URL = "http://192.168.0.101:8080/api/personal";
+final BASE_URL = "http://192.168.0.107:8080/api/personal";
 final LOGIN_URL = BASE_URL + '/login';
 final CHECK_NUMBER_URL = BASE_URL + '/mobile';
 final REGISTER = BASE_URL + '/register';
@@ -7,3 +7,4 @@ final OTP_VERIFY = BASE_URL + '/mobile/verifyCode';
 final SEND_MONEY = BASE_URL + '/sendMoney';
 final GET_TRANSACTIONS = BASE_URL + '/transactions';
 final GET_BALANCE = BASE_URL + '/balance';
+final CASH_OUT = BASE_URL + '/cashOut';
