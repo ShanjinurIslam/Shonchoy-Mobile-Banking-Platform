@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shonchoy_agent/controller/APIController.dart';
+import 'package:shonchoy_agent/model/cash_in.dart';
+import 'package:shonchoy_agent/scoped_model/my_model.dart';
 
 class CashIn extends StatefulWidget {
   @override
@@ -39,6 +42,8 @@ class CashInState extends State<CashIn> {
   }
 
   void getBalance() async {
+    balance = await APIController.getBalance(
+        ScopedModel.of<MyModel>(context).agent.authToken);
     setState(() {
       isLoading = false;
     });
@@ -97,6 +102,7 @@ class CashInState extends State<CashIn> {
                             height: 30,
                           ),
                           TextField(
+                            keyboardType: TextInputType.number,
                             controller: receiverTextField,
                             decoration: InputDecoration(
                                 labelText: 'Receiver',
@@ -164,10 +170,18 @@ class CashInState extends State<CashIn> {
                                         setState(() {
                                           isLoading = false;
                                         });
+                                        CashInModel cashInModel =
+                                            await APIController.cashIn(
+                                                receiverTextField.text,
+                                                ScopedModel.of<MyModel>(context)
+                                                    .agent
+                                                    .authToken,
+                                                pinCode.text,
+                                                double.parse(amount.text));
+
                                         Navigator.pushReplacementNamed(
-                                          context,
-                                          '/cashInInvoice',
-                                        );
+                                            context, '/cashInInvoice',
+                                            arguments: cashInModel);
                                       } catch (e) {
                                         setState(() {
                                           isLoading = false;

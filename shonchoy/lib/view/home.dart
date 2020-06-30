@@ -24,6 +24,9 @@ class HomeState extends State<Home> {
   }
 
   void getTransactions() async {
+    setState(() {
+      isLoading = true;
+    });
     transactions = await APIController.getTransactions(
         ScopedModel.of<MyModel>(context).personal.authToken);
     balance = await APIController.getBalance(
@@ -200,8 +203,10 @@ class HomeState extends State<Home> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 GestureDetector(
-                  child: Icon(Icons.arrow_forward),
-                  onTap: () {},
+                  child: Icon(Icons.replay),
+                  onTap: () async {
+                    getTransactions();
+                  },
                 )
               ],
             ),

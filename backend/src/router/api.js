@@ -64,6 +64,8 @@ router.post('/personal/mobile/sendCode', async(req, res) => {
     });
 })
 
+
+
 router.post('/personal/mobile/verifyCode', async(req, res) => {
     console.log(req.body);
     await nexmo.verify.check({
@@ -234,6 +236,10 @@ router.get('/personal/balance', personalAuth, async(req, res) => {
     return res.status(200).send({ balance: req.personal.balance });
 })
 
+router.get('/agent/balance', agentAuth, async(req, res) => {
+    return res.status(200).send({ balance: parseFloat(req.agent.balance) });
+})
+
 router.post('/personal/payment', personalAuth, async(req, res) => {
     const pinCode = req.body.pinCode
     const amount = req.body.amount
@@ -268,7 +274,12 @@ router.post('/personal/payment', personalAuth, async(req, res) => {
 router.get('/personal/transactions', personalAuth, async(req, res) => {
 
     try {
-        const allSm = await Sendmoney.find({ $or: [{ sender: req.personal._id }, { receiver: req.personal._id }] }).sort('-createdAt')
+        var allSm = await Sendmoney.find({ $or: [{ sender: req.personal._id }, { receiver: req.personal._id }] }).sort('-createdAt')
+        const allCashOut = await CashOut.find({ sender: req.personal._id })
+        const allCashIns = await CashIn.find({ receiver: req.personal._id })
+
+        allSm = allSm.concat(allCashOut)
+        allSm = allSm.concat(allCashIns)
 
         for (var i = 0; i < allSm.length; i++) {
 
@@ -279,27 +290,34 @@ router.get('/personal/transactions', personalAuth, async(req, res) => {
             object.type = transaction.transactionType
             object.amount = transaction.amount
 
-
-            const sender = await Personal.findById(allSm[i].sender)
-            object.sender = sender.mobileNo
-
-            const receiver = await Personal.findById(allSm[i].receiver)
-            object.receiver = receiver.mobileNo
-
-            if (object.sender == req.personal.mobileNo) {
+            if (object.type == "cashIn") {
+                object.receiver = req.personal.mobileNo
+                const agent = await Agent.findById(allSm[i].sender)
+                object.sender = agent.mobileNo
+                object.as = "receiver"
+            } else if (object.type == "cashOut") {
+                object.sender = req.personal.mobileNo
+                const agent = await Agent.findById(allSm[i].receiver)
+                object.receiver = agent.mobileNo
                 object.as = "sender"
             } else {
-                object.as = "receiver"
+                if (allSm[i].sender == req.personal._id) {
+                    object.sender = req.personal.mobileNo
+                    const personal = await Personal.findById(allSm[i].receiver)
+                    object.receiver = personal.mobileNo
+                    object.as = "sender"
+                } else {
+                    object.receiver = req.personal.mobileNo
+                    const personal = await Personal.findById(allSm[i].receiver)
+                    object.sender = personal.mobileNo
+                    object.as = "receiver"
+                }
             }
 
             object.createdAt = allSm[i].createdAt
 
             allSm[i] = object
         }
-
-        // cash in cash outs
-
-        // payments
 
         res.status(200).send(allSm)
     } catch (e) {
@@ -358,7 +376,16 @@ router.post('/agent/login', async(req, res) => {
             res.status(200).send({ message: "Account Verification Still in Progress" })
         } else {
             const token = await agent.generateAuthToken()
-            res.status(200).send({ agent, token })
+                //
+
+            var object = Object();
+            object.client = await Client.findById(agent.client)
+            object.businessOrganizationName = agent.businessOrganizationName
+            object.mobileNo = agent.mobileNo
+            object.authToken = token
+
+
+            res.status(200).send(object)
         }
     } catch (e) {
         res.status(502).send({ message: e.message })
@@ -410,7 +437,16 @@ router.post('/agent/cashIn', agentAuth, async(req, res) => {
 
                 const cashIn = new CashIn({ transaction: transaction._id, sender: agent._id, receiver: personal._id })
                 await cashIn.save()
-                return res.status(200).send(cashIn)
+
+                var object = new Object()
+
+                object._id = cashIn._id
+                object.transactionId = transaction._id
+                object.amount = transaction.amount
+                object.receiver = mobileNo
+                object.createdAt = cashIn.createdAt
+
+                return res.status(200).send(object)
             } else {
                 res.status(402).send('Insufficient Balance')
             }
@@ -422,18 +458,85 @@ router.post('/agent/cashIn', agentAuth, async(req, res) => {
     }
 })
 
+router.get('/agent/cashOut', agentAuth, async(req, res) => {
+    try {
+        const cashOuts = await CashOut.find({ receiver: req.agent._id })
+
+        for (var i = 0; i < cashOuts.length; i++) {
+            var object = Object()
+            object._id = cashOuts[i]._id
+            const transaction = await Transaction.findById(cashOuts[i].transaction)
+
+            object.transactionId = transaction._id
+            object.amount = transaction.amount
+
+            const personal = await Personal.findById(cashOuts[i].sender)
+            object.sender = personal.mobileNo
+
+            object.createdAt = cashOuts[i].createdAt
+
+            cashOuts[i] = object
+        }
+        return res.status(200).send(cashOuts)
+
+    } catch (e) {
+        console.log(e.message)
+        res.status(400).send(e.message)
+    }
+})
+
+router.get('/agent/transactions', agentAuth, async(req, res) => {
+    try {
+        var allCashIns = await CashIn.find({ sender: req.agent._id })
+        const allCashOut = await CashOut.find({ receiver: req.agent._id })
+
+        allCashIns = allCashIns.concat(allCashOut)
+
+        for (var i = 0; i < allCashIns.length; i++) {
+
+            var object = new Object()
+
+            const transaction = await Transaction.findById(allCashIns[i].transaction)
+            object._id = transaction._id
+            object.type = transaction.transactionType
+            object.amount = transaction.amount
+
+            if (object.type == "cashIn") {
+                object.sender = req.agent.mobileNo
+                const personal = await Personal.findById(allCashIns[i].receiver)
+                object.receiver = personal.mobileNo
+                object.as = "sender"
+            } else {
+                object.receiver = req.agent.mobileNo
+                const personal = await Personal.findById(allCashIns[i].sender)
+                object.sender = personal.mobileNo
+                object.as = "receiver"
+            }
+
+            object.createdAt = allCashIns[i].createdAt
+
+            allCashIns[i] = object
+        }
+
+        res.status(200).send(allCashIns)
+    } catch (e) {
+        res.status(400).send(e.message)
+    }
+})
+
 // personal -> agent cash out
 router.post('/personal/cashOut', personalAuth, async(req, res) => {
+    console.log(req.body)
     try {
         const personal = req.personal
-        const agent = await Agent.findOne({ mobileNo: req.body.mobileNo })
-        const isMatch = await bcrypt.compare(req.body.pinCode, agent.pinCode)
+        const agent = await Agent.findOne({ mobileNo: req.body.receiver })
+        const isMatch = await bcrypt.compare(req.body.pinCode, personal.pinCode)
         if (isMatch) {
             const amount = parseFloat(req.body.amount)
             const charge = parseFloat(req.body.charge)
 
             if (personal.balance > amount + charge) {
-                const transaction = new Transaction({ transactionType: req.body.transactionType, amount: (amount + charge) })
+                const transaction = new Transaction({ transactionType: req.body.transactionType, amount: (amount) })
                 agent.balance = agent.balance + amount + (.25 * charge)
                 personal.balance = personal.balance - amount - charge
 
@@ -443,7 +546,20 @@ router.post('/personal/cashOut', personalAuth, async(req, res) => {
 
                 const cashOut = new CashOut({ transaction: transaction._id, sender: personal._id, receiver: agent._id })
                 await cashOut.save()
-                return res.status(200).send(cashOut)
+
+                var object = Object();
+                object._id = cashOut._id;
+                object.transactionId = transaction._id
+                object.amount = amount;
+                object.charge = charge;
+                object.transactionType = transaction.transactionType
+                object.sender = req.personal.mobileNo
+                object.receiver = agent.mobileNo
+                object.createdAt = cashOut.createdAt
+
+                console.log(object)
+
+                return res.status(200).send(object)
             } else {
                 res.status(402).send('Insufficient Balance')
             }
@@ -452,6 +568,7 @@ router.post('/personal/cashOut', personalAuth, async(req, res) => {
         }
 
     } catch (e) {
+        console.log(e)
         res.send(e.message)
     }
 })
@@ -536,10 +653,11 @@ router.post('/merchant/logoutAll', merchantAuth, async(req, res) => {
     }
 })
 
+/*
 router.get('/personal/statements', personalAuth, async(req, res) => {
     const sendMoney = await Sendmoney.find({ $or: [{ 'sender': req.personal._id }, { 'receiver': req.personal._id }] })
     const cashIn = await CashIn.find({ $or: [{ 'receiver': req.personal._id }] })
     const cashOut = await CashOut.find({ $or: [{ 'sender': req.personal._id }] })
     res.send({ sendMoney, cashIn, cashOut })
-})
+})*/
 module.exports = router

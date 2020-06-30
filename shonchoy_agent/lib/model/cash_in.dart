@@ -1,4 +1,4 @@
-class CashIn {
+class CashInModel {
   final String id;
   final String transactionId;
   final String amount;
@@ -6,11 +6,16 @@ class CashIn {
   final String receiver;
   final String createdAt;
 
-  CashIn(this.id, this.transactionId, this.amount, this.sender, this.receiver,
-      this.createdAt);
+  CashInModel(this.id, this.transactionId, this.amount, this.sender,
+      this.receiver, this.createdAt);
 
-  factory CashIn.fromJson(Map<String, dynamic> json) {
-    return CashIn(json['_id'], json['transactionId'], json['amount'].toString(),
-        json['sender'], json['receiver'], json['createdAt']);
+  factory CashInModel.fromJson(Map<String, dynamic> json) {
+    return CashInModel(
+        json['_id'],
+        json['transactionId'],
+        json['amount'].toString(),
+        json['sender'],
+        json['receiver'],
+        json['createdAt']);
   }
 }

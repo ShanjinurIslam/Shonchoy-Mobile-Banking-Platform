@@ -97,7 +97,7 @@ class APIController {
         ));
 
     if (response.statusCode == 200) {
-      double balance = response.data['balance'];
+      double balance = double.parse(response.data['balance'].toString());
       return balance;
     } else {
       throw Exception(response.data['message']);

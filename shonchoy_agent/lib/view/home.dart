@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shonchoy_agent/controller/APIController.dart';
+import 'package:shonchoy_agent/model/transaction.dart';
+import 'package:shonchoy_agent/scoped_model/my_model.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -11,6 +15,7 @@ class Home extends StatefulWidget {
 class HomeState extends State<Home> {
   bool isLoading = true;
   double balance = 0;
+  List<Transaction> transactions = new List<Transaction>();
 
   @override
   void initState() {
@@ -19,6 +24,13 @@ class HomeState extends State<Home> {
   }
 
   void getTransactions() async {
+    setState(() {
+      isLoading = true;
+    });
+    transactions = await APIController.getTransactions(
+        ScopedModel.of<MyModel>(context).agent.authToken);
+    balance = await APIController.getBalance(
+        ScopedModel.of<MyModel>(context).agent.authToken);
     setState(() {
       isLoading = false;
     });
@@ -100,7 +112,9 @@ class HomeState extends State<Home> {
                     style: TextStyle(color: Colors.white, fontSize: 10),
                   ),
                   Text(
-                    'Placeholder',
+                    ScopedModel.of<MyModel>(context)
+                        .agent
+                        .businessOrganizationName,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -165,8 +179,10 @@ class HomeState extends State<Home> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 GestureDetector(
-                  child: Icon(Icons.arrow_forward),
-                  onTap: () {},
+                  child: Icon(Icons.replay),
+                  onTap: () async {
+                    getTransactions();
+                  },
                 )
               ],
             ),
@@ -176,8 +192,7 @@ class HomeState extends State<Home> {
                   child: CupertinoActivityIndicator(),
                 )
               : Expanded(
-                  child: Container(),
-                  /*child: transactions.length < 1
+                  child: transactions.length < 1
                       ? Padding(
                           padding: EdgeInsets.all(24),
                           child: Text('No transactions'))
@@ -195,8 +210,11 @@ class HomeState extends State<Home> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       Tab(
-                                          icon: new Image.asset(
-                                              "images/sendmoney.png")),
+                                          icon: new Image.asset("images/" +
+                                              transactions[index]
+                                                  .type
+                                                  .toLowerCase() +
+                                              ".png")),
                                       Spacer(
                                         flex: 2,
                                       ),
@@ -235,8 +253,7 @@ class HomeState extends State<Home> {
                                 color: Colors.white);
                           },
                           itemCount: transactions.length,
-                        )*/
-                )
+                        ))
         ]),
       ),
     );

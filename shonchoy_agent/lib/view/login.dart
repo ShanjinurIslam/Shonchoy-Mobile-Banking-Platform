@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shonchoy_agent/controller/AuthController.dart';
+import 'package:shonchoy_agent/model/agent.dart';
+import 'package:shonchoy_agent/scoped_model/my_model.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -124,6 +128,13 @@ class LogInScreenState extends State<LogInScreen> {
                                     isLoading = true;
                                   });
                                   try {
+                                    Agent agent = await AuthController.logIn(
+                                        mobileNo.text, pinCode.text);
+
+                                    print(agent.businessOrganizationName);
+                                    ScopedModel.of<MyModel>(context)
+                                        .setAgent(agent);
+
                                     Navigator.pushReplacementNamed(
                                         context, '/home');
                                   } catch (e) {
